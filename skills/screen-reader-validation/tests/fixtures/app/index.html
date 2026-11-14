@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fixture shop</title>
+<style>
+  body { font: 16px/1.4 system-ui, sans-serif; margin: 16px; }
+  .bar { display: flex; gap: 8px; align-items: center; }
+  .cols { display: flex; flex-direction: column; }
+  .cols .first { order: 2; }
+  .cols .second { order: 1; }
+  #menu[hidden], #overlay[hidden] { display: none; }
+  #overlay { position: fixed; inset: 20% 30%; background: #fff; border: 1px solid #333; padding: 16px; }
+  .fake { display: inline-block; padding: 4px 8px; border: 1px solid #333; }
+  .error { color: #a00; }
+</style>
+</head>
+<body>
+  <!-- Deliberately broken patterns (no main landmark, no headings) for the analyser tests. -->
+  <div class="bar">
+    <button id="icon-btn" type="button"><svg width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/></svg></button>
+    <button id="menu-btn" type="button" aria-expanded="false" aria-controls="menu">Menu</button>
+    <div id="fake-btn" class="fake" tabindex="0" onclick="">Fake action</div>
+    <button id="emoji-btn" type="button">🚀 Launch</button>
+  </div>
+  <ul id="menu" hidden><li><a href="#a">First link</a></li></ul>
+
+  <div class="cols">
+    <p class="first">First paragraph in the source order.</p>
+    <p class="second">Second paragraph in the source order.</p>
+  </div>
+
+  <p><button id="open" type="button">Open settings</button></p>
+  <div id="overlay" role="dialog" aria-modal="true" aria-label="Settings" hidden><span>Settings panel</span> <button id="close" type="button">Close</button></div>
+
+  <p><button id="save" type="button">Save</button></p>
+  <div id="status-slot"></div>
+
+  <form id="form" novalidate onsubmit="return false">
+    <label for="email">Email</label> <input id="email" type="email">
+    <button id="submit" type="submit">Submit</button>
+    <p id="email-error" class="error"></p>
+  </form>
+
+  <p><button id="good-open" type="button">Open help</button></p>
+  <dialog id="good-dialog" aria-labelledby="good-title">
+    <p id="good-title">Help</p>
+    <button id="good-close" type="button">Done</button>
+  </dialog>
+  <p><button id="good-toggle" type="button" aria-expanded="false" aria-controls="good-panel">More details</button></p>
+  <div id="good-panel" hidden>Details text.</div>
+  <div role="status" id="good-status"></div>
+  <p><button id="good-save" type="button">Save draft</button></p>
+  <p><button id="good-ctx" type="button">Share link</button></p>
+  <p><label for="note">Note</label> <input id="note" type="text"></p>
+
+  <form id="signin" onsubmit="return false">
+    <label for="pw">Password</label> <input id="pw" type="password" autocomplete="current-password">
+  </form>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  // Toggle that never updates aria-expanded.
+  $('menu-btn').addEventListener('click', () => { $('menu').hidden = !$('menu').hidden; });
+  // Overlay that neither takes focus nor returns it.
+  $('open').addEventListener('click', () => { $('overlay').hidden = false; });
+  $('close').addEventListener('click', () => { $('overlay').hidden = true; $('close').blur(); });
+  // Live region inserted together with its message (not announced by screen readers).
+  $('save').addEventListener('click', () => { $('status-slot').innerHTML = '<div role="status">Saved successfully</div>'; });
+  // Error shown as plain text, not associated with the field.
+  $('submit').addEventListener('click', () => { $('email-error').textContent = $('email').value.includes('@') ? '' : 'Enter a valid email address'; });
+
+  // Well-built counterparts.
+  $('good-open').addEventListener('click', () => $('good-dialog').showModal());
+  $('good-close').addEventListener('click', () => $('good-dialog').close());
+  $('good-toggle').addEventListener('click', (e) => {
+    const open = e.currentTarget.getAttribute('aria-expanded') !== 'true';
+    e.currentTarget.setAttribute('aria-expanded', String(open));
+    $('good-panel').hidden = !open;
+  });
+  $('good-save').addEventListener('click', () => { $('good-status').textContent = 'Draft saved'; });
+  // Right-click only: proves the replay dispatched the requested mouse button.
+  $('good-ctx').addEventListener('contextmenu', (e) => { e.preventDefault(); $('good-status').textContent = 'Share options opened'; });
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "screen-reader-validation-skill",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Replays scope-definition journeys with a real screen reader (Guidepup: NVDA / VoiceOver) and reports narration issues (companion to accessibility-assessment).",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "preflight": "node scripts/sr.mjs preflight"
+  },
+  "optionalDependencies": {
+    "@guidepup/guidepup": "^0.40.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

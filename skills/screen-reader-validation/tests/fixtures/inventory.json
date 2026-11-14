@@ -1,0 +1,9 @@
+{
+  "app": { "name": "Fixture shop", "baseUrl": "http://PLACEHOLDER/" },
+  "viewports": { "desktop": { "width": 1280, "height": 800 }, "mobile": { "width": 375, "height": 812 } },
+  "features": [
+    { "id": "shop", "name": "Shop", "screens": [
+      { "id": "home", "name": "Home", "type": "page", "url": "index.html", "ready": { "selector": "#open" } }
+    ] }
+  ]
+}

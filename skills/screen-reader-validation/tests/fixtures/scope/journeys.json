@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "journeys": [
+    {
+      "id": "broken-flow",
+      "title": "Toolbar, settings overlay, save and email form",
+      "producer": "text",
+      "producerVersion": 1,
+      "feature": { "id": "shop" },
+      "start": { "screen": "home" },
+      "segments": [
+        {
+          "kind": "state",
+          "screen": "home",
+          "state": { "id": "broken", "name": "Broken patterns" },
+          "steps": [
+            { "action": "press", "key": "Tab" },
+            { "action": "focus", "target": { "selector": "#fake-btn" } },
+            { "action": "click", "target": { "role": "button", "name": "Menu" } },
+            { "action": "focus", "target": { "selector": "#emoji-btn" } },
+            { "action": "click", "target": { "role": "button", "name": "Open settings" } },
+            { "action": "click", "target": { "selector": "#close" } },
+            { "action": "click", "target": { "role": "button", "name": "Save", "exact": true } },
+            { "action": "fill", "target": { "selector": "#email" }, "value": "not-an-email" },
+            { "action": "click", "target": { "role": "button", "name": "Submit" } }
+          ]
+        }
+      ],
+      "viewports": ["desktop"]
+    },
+    {
+      "id": "good-flow",
+      "title": "Help dialog, details toggle and draft save",
+      "producer": "text",
+      "producerVersion": 1,
+      "feature": { "id": "shop" },
+      "start": { "screen": "home" },
+      "segments": [
+        {
+          "kind": "state",
+          "screen": "home",
+          "state": { "id": "good", "name": "Well-built patterns" },
+          "steps": [
+            { "action": "click", "target": { "selector": "#good-open" } },
+            { "action": "click", "target": { "selector": "#good-close" } },
+            { "action": "click", "target": { "selector": "#good-toggle" } },
+            { "action": "click", "target": { "selector": "#good-save" } },
+            { "action": "click", "button": "right", "target": { "selector": "#good-ctx" } },
+            { "action": "fill", "target": { "selector": "#note" }, "value": "Zebra-Sentinel-4242" }
+          ]
+        }
+      ],
+      "viewports": ["desktop"]
+    },
+    {
+      "id": "secret-flow",
+      "title": "Sign in with a password",
+      "producer": "text",
+      "producerVersion": 1,
+      "feature": { "id": "shop" },
+      "start": { "screen": "home" },
+      "segments": [
+        {
+          "kind": "state",
+          "screen": "home",
+          "state": { "id": "signin", "name": "Sign in" },
+          "steps": [
+            { "action": "fill", "target": { "selector": "#pw" }, "value": "Hunter2-Sentinel-9999" }
+          ]
+        }
+      ],
+      "viewports": ["desktop"]
+    }
+  ]
+}

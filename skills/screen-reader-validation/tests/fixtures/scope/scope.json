@@ -1,0 +1,9 @@
+{
+  "schemaVersion": 1,
+  "id": "sr-fixture",
+  "intent": "Toolbar, settings overlay, save and the email form; plus the well-built help dialog",
+  "inventory": ".a11y/inventory.json",
+  "journeys": "journeys.json",
+  "targets": ["home__broken__desktop", "home__good__desktop"],
+  "storageState": null
+}
