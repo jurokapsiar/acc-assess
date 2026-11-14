@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.*
+
+# Package manager and tool caches
+.npm/
+.yarn/
+.bun/
+.vite/
+.vitest/
+
+# Build output
+/build/
+/dist/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+bun-debug.log*
+
+# macOS
+.DS_Store
+
+# accessibility-assessment skill: generated
+skills/accessibility-assessment/knowledge/
+skills/accessibility-assessment/.cache/
+.a11y/reports/
+.a11y/inventory-shots/
+skills/accessibility-assessment/tests/.out/
+skills/accessibility-assessment/tests/fixtures/react/bundle.js
+skills/accessibility-assessment/tests/fixtures/react/bundle.js.map
+research/
+
+# screen-reader-validation skill: generated
+.a11y/sr-runs/
+skills/screen-reader-validation/tests/.out/
+
+# scope-definition skill: generated
+skills/scope-definition/tests/.out/
