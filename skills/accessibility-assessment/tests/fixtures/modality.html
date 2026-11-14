@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Modality fixture</title></head>
+<body>
+<main id="scope">
+  <h1>Modality fixture</h1>
+  <button id="ok" type="button" onclick="document.getElementById('out').textContent = 'saved'">Save changes</button>
+  <div id="mouse-only" onclick="document.getElementById('out').textContent = 'details open'" style="padding:4px;border:1px solid #444;display:inline-block">Open details</div>
+  <button id="script-only" type="button" tabindex="-1" onclick="document.getElementById('out').textContent = 'extra open'">Extra options</button>
+  <button id="dead-key" type="button" onmousedown="document.getElementById('out').textContent = 'pressed'">Press only with pointer</button>
+  <a href="#end" id="far">Last link</a>
+  <p id="out" role="status"></p>
+</main>
+</body>
+</html>

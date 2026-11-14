@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "journeys": [
+    {
+      "id": "scope-added-journey",
+      "title": "A brand-new page screen added purely by the scope overlay",
+      "producer": "text",
+      "producerVersion": 1,
+      "feature": { "id": "demo", "name": "Demo fixtures" },
+      "start": { "url": "contrast.html" },
+      "segments": [
+        {
+          "kind": "screen",
+          "screen": {
+            "id": "scope-added",
+            "name": "Scope-added fixture",
+            "type": "page",
+            "url": "contrast.html",
+            "scope": "#scope"
+          },
+          "steps": []
+        }
+      ],
+      "viewports": ["desktop"]
+    },
+    {
+      "id": "host-dialog-extra-state",
+      "title": "An extra state on an existing screen (no new steps needed)",
+      "producer": "text",
+      "producerVersion": 1,
+      "feature": { "id": "demo" },
+      "start": { "screen": "host-dialog" },
+      "segments": [
+        {
+          "kind": "state",
+          "screen": "host-dialog",
+          "state": { "id": "scope-state", "name": "Scope-added state" },
+          "steps": [
+            {
+              "action": "focus",
+              "target": { "selector": "#dlg-close" },
+              "rec": { "producer": "text", "confidence": "snapshot", "evidence": [{ "snapshot": "work/snapshots/1.yml", "ref": "e1" }] }
+            }
+          ]
+        }
+      ],
+      "viewports": ["desktop"]
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Hashed fixture</title></head>
+<body>
+<main id="scope">
+  <!-- A second, already-fine-contrast h2 so axe can't pick a bare "h2" tag selector for
+       the flagged one below (that would trivially survive the before/after class rename
+       and never exercise tier-3 relocation). -->
+  <h2 class="heading-ok" style="color:#111111">Unrelated section title</h2>
+  <div id="before-sibling-slot"></div>
+  <h2 class="before-class-abc">Settings panel title</h2>
+</main>
+<script>
+  // ?v=after simulates a build that renamed the CSS module class AND shifted this
+  // element's structural position (a new sibling is inserted before it) - any
+  // selector-based relocation must fail, leaving only role+name to find it again.
+  var v = new URLSearchParams(location.search).get('v');
+  var h2 = document.querySelector('h2.before-class-abc, h2.after-class-zzz');
+  if (v === 'after') {
+    var spacer = document.createElement('p');
+    spacer.textContent = 'Inserted spacer paragraph.';
+    h2.before(spacer);
+    h2.className = 'after-class-zzz';
+    h2.style.color = '#333333';
+  } else {
+    h2.style.color = '#bbbbbb';
+  }
+</script>
+</body>
+</html>

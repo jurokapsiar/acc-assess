@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Regress fixture</title></head>
+<body>
+<main id="scope">
+  <h2 id="title">Regress heading</h2>
+</main>
+<script>
+  // ?v=after fixes the original contrast issue but introduces a brand new unlabeled
+  // icon button elsewhere on the page - a regression the fix file never listed.
+  var v = new URLSearchParams(location.search).get('v');
+  document.getElementById('title').style.color = v === 'after' ? '#333333' : '#bbbbbb';
+  if (v === 'after') {
+    var btn = document.createElement('button');
+    btn.innerHTML = '<span aria-hidden="true">+</span>';
+    btn.id = 'new-regression-btn';
+    document.getElementById('scope').appendChild(btn);
+  }
+</script>
+</body>
+</html>

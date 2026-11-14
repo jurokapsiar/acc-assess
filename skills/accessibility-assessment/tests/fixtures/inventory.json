@@ -1,0 +1,168 @@
+{
+  "app": {
+    "baseUrl": "http://PLACEHOLDER/"
+  },
+  "viewports": {
+    "desktop": {
+      "width": 1280,
+      "height": 800
+    },
+    "mobile": {
+      "width": 375,
+      "height": 812
+    }
+  },
+  "features": [
+    {
+      "id": "demo",
+      "name": "Demo fixtures",
+      "screens": [
+        {
+          "id": "contrast",
+          "name": "Contrast fixture",
+          "type": "page",
+          "url": "contrast.html",
+          "scope": "#scope"
+        },
+        {
+          "id": "repeated",
+          "name": "Repeated fixture",
+          "type": "page",
+          "url": "repeated.html",
+          "scope": "#scope"
+        },
+        {
+          "id": "hashed",
+          "name": "Hashed fixture",
+          "type": "page",
+          "url": "hashed.html",
+          "scope": "#scope"
+        },
+        {
+          "id": "removed",
+          "name": "Removed fixture",
+          "type": "page",
+          "url": "removed.html",
+          "scope": "#scope"
+        },
+        {
+          "id": "reflow",
+          "name": "Reflow fixture",
+          "type": "page",
+          "url": "reflow.html",
+          "scope": "#scope"
+        },
+        {
+          "id": "regress",
+          "name": "Regress fixture",
+          "type": "page",
+          "url": "regress.html",
+          "scope": "#scope"
+        },
+        {
+          "id": "spacing",
+          "name": "Text spacing fixture",
+          "type": "page",
+          "url": "spacing.html",
+          "scope": "#scope"
+        },
+        {
+          "id": "host",
+          "name": "Host fixture",
+          "type": "page",
+          "url": "host.html",
+          "scope": "#host-main"
+        },
+        {
+          "id": "host-dialog",
+          "name": "Host dialog",
+          "type": "dialog",
+          "parent": "host",
+          "scope": "#dlg",
+          "trigger": "Click \"Open dialog\"",
+          "steps": [
+            {
+              "action": "click",
+              "target": {
+                "selector": "#open-dialog-btn"
+              }
+            },
+            {
+              "action": "waitFor",
+              "target": {
+                "selector": "#dlg"
+              },
+              "state": "visible"
+            }
+          ]
+        },
+        {
+          "id": "overlay",
+          "name": "Overlay fixture",
+          "type": "page",
+          "url": "overlay.html",
+          "scope": "#main"
+        },
+        {
+          "id": "overlay-menu",
+          "name": "Overlay menu",
+          "type": "menu",
+          "parent": "overlay",
+          "scope": "#menu",
+          "trigger": "Click \"Actions\"",
+          "steps": [
+            {
+              "target": {
+                "selector": "#open-menu"
+              },
+              "action": "click"
+            },
+            {
+              "target": {
+                "selector": "#menu"
+              },
+              "state": "visible",
+              "action": "waitFor"
+            }
+          ]
+        },
+        {
+          "id": "overlay-popover",
+          "name": "Overlay popover",
+          "type": "popover",
+          "parent": "overlay",
+          "scope": "#pop",
+          "trigger": "Click \"Details\"",
+          "steps": [
+            {
+              "target": {
+                "selector": "#open-pop"
+              },
+              "action": "click"
+            },
+            {
+              "target": {
+                "selector": "#pop"
+              },
+              "state": "visible",
+              "action": "waitFor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "react",
+      "name": "React fixtures",
+      "screens": [
+        {
+          "id": "react-app",
+          "name": "React fixture app",
+          "type": "page",
+          "url": "react/index.html",
+          "scope": "#app-root"
+        }
+      ]
+    }
+  ]
+}

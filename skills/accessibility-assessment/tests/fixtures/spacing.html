@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Text spacing fixture</title></head>
+<body>
+<main id="scope">
+  <div class="card"><p id="label" style="margin:0;width:220px;height:17px;overflow:hidden;font:14px/1.15 sans-serif">Short label text</p></div>
+</main>
+<script>
+  // ?v=after simulates the fix: the fixed height becomes a min-height.
+  if (new URLSearchParams(location.search).get('v') === 'after') {
+    var el = document.getElementById('label');
+    el.style.height = 'auto';
+    el.style.minHeight = '17px';
+  }
+</script>
+</body>
+</html>

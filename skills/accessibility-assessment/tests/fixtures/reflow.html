@@ -1,0 +1,14 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Reflow fixture</title></head>
+<body>
+<main id="scope">
+  <div id="wide" style="height:50px;background:#eee">Too wide for a 320px viewport when unfixed.</div>
+</main>
+<script>
+  // ?v=after simulates the fix: the element shrinks to fit a 320px viewport.
+  var v = new URLSearchParams(location.search).get('v');
+  document.getElementById('wide').style.width = v === 'after' ? '280px' : '500px';
+</script>
+</body>
+</html>

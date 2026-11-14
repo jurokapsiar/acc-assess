@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Removed fixture</title></head>
+<body>
+<main id="scope">
+  <p>Some text before the link.</p>
+  <a id="old-link" href="#" style="color:#bbbbbb">Learn more</a>
+  <p>Some text after the link.</p>
+</main>
+<script>
+  // ?v=after simulates removing the whole offending element (not just hiding it).
+  var v = new URLSearchParams(location.search).get('v');
+  if (v === 'after') document.getElementById('old-link').remove();
+</script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Contrast fixture</title></head>
+<body>
+<main id="scope">
+  <h1 id="title">Section title</h1>
+  <p>Body copy, long enough to pad the layout a little.</p>
+</main>
+<script>
+  // ?v=after simulates the fix: darkens the title to a passing contrast ratio.
+  var v = new URLSearchParams(location.search).get('v');
+  document.getElementById('title').style.color = v === 'after' ? '#333333' : '#bbbbbb';
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Overlay fixture</title>
+<style>#menu,#pop{border:1px solid #333;padding:8px;margin:8px 0} [role=menuitem]{display:block}</style></head>
+<body>
+<main id="main">
+  <h1>Overlay fixture</h1>
+  <button id="open-menu" type="button" aria-haspopup="menu">Actions</button>
+  <div id="menu" role="menu" aria-label="Actions" hidden>
+    <div role="menuitem" tabindex="-1" id="mi-1">Rename</div>
+    <div role="menuitem" tabindex="-1" id="mi-2">Delete</div>
+  </div>
+  <button id="open-pop" type="button">Details</button>
+  <div id="pop" role="group" aria-label="Details" hidden><a href="#more">More</a></div>
+  <button id="after" type="button">After</button>
+</main>
+<script>
+  var menu = document.getElementById('menu');
+  var openMenu = document.getElementById('open-menu');
+  openMenu.addEventListener('click', function () { menu.hidden = false; document.getElementById('mi-1').focus(); });
+  menu.addEventListener('keydown', function (e) {
+    if (e.key === 'Tab') { menu.hidden = true; }
+    if (e.key === 'Escape') { menu.hidden = true; openMenu.focus(); }
+  });
+  document.getElementById('open-pop').addEventListener('click', function () { document.getElementById('pop').hidden = false; });
+</script>
+</body>
+</html>

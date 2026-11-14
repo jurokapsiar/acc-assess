@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Repeated fixture</title></head>
+<body>
+<main id="scope">
+  <ul id="list">
+    <li><button class="icon-btn" data-i="0"><span aria-hidden="true">&#9654;</span></button></li>
+    <li><button class="icon-btn" data-i="1"><span aria-hidden="true">&#9654;</span></button></li>
+    <li><button class="icon-btn" data-i="2"><span aria-hidden="true">&#9654;</span></button></li>
+    <li><button class="icon-btn" data-i="3"><span aria-hidden="true">&#9654;</span></button></li>
+    <li><button class="icon-btn" data-i="4"><span aria-hidden="true">&#9654;</span></button></li>
+  </ul>
+</main>
+<script>
+  // ?v=after simulates fixing one of the five identical unlabeled buttons (same count,
+  // same DOM structure/selectors - only button #4, the LAST one in document order,
+  // gains an accessible name). The fixed button is deliberately the last one so that
+  // all of its siblings (#0-#3) have already self-claimed their own unchanged selector
+  // via tier-1 relocation by the time #4's probe is evaluated, avoiding an order-
+  // dependent tier-3 (role+name) mismatch across identical unlabeled candidates.
+  // ?v=countchange additionally removes button #1 entirely, shifting every later
+  // button's structural (nth-child) position - nothing should be guessed as a match there.
+  var v = new URLSearchParams(location.search).get('v');
+  if (v === 'after' || v === 'countchange') {
+    document.querySelector('.icon-btn[data-i="4"]').setAttribute('aria-label', 'Play track 4');
+  }
+  if (v === 'countchange') {
+    document.querySelector('.icon-btn[data-i="1"]').closest('li').remove();
+  }
+</script>
+</body>
+</html>
