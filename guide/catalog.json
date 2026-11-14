@@ -1,0 +1,4814 @@
+{
+  "summary": {
+    "rules": 182,
+    "criteria": 86,
+    "patterns": 30,
+    "rulesByTool": {
+      "axe-core": 103,
+      "AbleDOM": 7,
+      "Playwright": 27,
+      "Guidepup": 21,
+      "agent": 24
+    },
+    "criteriaByLevel": {
+      "A": 31,
+      "AA": 24,
+      "AAA": 31
+    },
+    "criteriaByTool": {
+      "axe-core": 31,
+      "Guidepup": 8,
+      "agent": 55,
+      "manual": 21,
+      "AbleDOM": 7,
+      "Playwright": 8
+    },
+    "coverage": {
+      "automated": 41,
+      "manual": 14,
+      "agent": 31
+    },
+    "modalityRules": 18,
+    "tools": 6
+  },
+  "tools": [
+    "axe-core",
+    "AbleDOM",
+    "Playwright",
+    "Guidepup",
+    "agent",
+    "manual"
+  ],
+  "criteria": [
+    {
+      "num": "1.1.1",
+      "title": "Non-text Content",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-content",
+      "tools": [
+        "axe-core",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "aria-meter-name",
+        "aria-progressbar-name",
+        "image-alt",
+        "input-image-alt",
+        "object-alt",
+        "role-img-alt",
+        "svg-img-alt",
+        "sr-symbol-noise"
+      ]
+    },
+    {
+      "num": "1.2.1",
+      "title": "Audio-only and Video-only (Prerecorded)",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-only-and-video-only-prerecorded",
+      "tools": [
+        "axe-core",
+        "manual"
+      ],
+      "rules": [
+        "audio-caption"
+      ]
+    },
+    {
+      "num": "1.2.2",
+      "title": "Captions (Prerecorded)",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/captions-prerecorded",
+      "tools": [
+        "axe-core",
+        "manual"
+      ],
+      "rules": [
+        "video-caption"
+      ]
+    },
+    {
+      "num": "1.2.3",
+      "title": "Audio Description or Media Alternative (Prerecorded)",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-description-or-media-alternative-prerecorded",
+      "tools": [
+        "axe-core",
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.2.4",
+      "title": "Captions (Live)",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/captions-live",
+      "tools": [
+        "axe-core",
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.2.5",
+      "title": "Audio Description (Prerecorded)",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-description-prerecorded",
+      "tools": [
+        "axe-core",
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.2.6",
+      "title": "Sign Language (Prerecorded)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/sign-language-prerecorded",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.2.7",
+      "title": "Extended Audio Description (Prerecorded)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/extended-audio-description-prerecorded",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.2.8",
+      "title": "Media Alternative (Prerecorded)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/media-alternative-prerecorded",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.2.9",
+      "title": "Audio-only (Live)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-only-live",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.3.1",
+      "title": "Info and Relationships",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/info-and-relationships",
+      "tools": [
+        "axe-core",
+        "AbleDOM",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "aria-hidden-body",
+        "aria-required-children",
+        "aria-required-parent",
+        "definition-list",
+        "dlitem",
+        "list",
+        "listitem",
+        "p-as-heading",
+        "table-fake-caption",
+        "td-has-header",
+        "td-headers-attr",
+        "th-has-data-cells",
+        "missing-id",
+        "sr-no-headings"
+      ]
+    },
+    {
+      "num": "1.3.2",
+      "title": "Meaningful Sequence",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/meaningful-sequence",
+      "tools": [
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "sr-reading-order",
+        "tab-order-reading-order"
+      ]
+    },
+    {
+      "num": "1.3.3",
+      "title": "Sensory Characteristics",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/sensory-characteristics",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.3.4",
+      "title": "Orientation",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/orientation",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "css-orientation-lock",
+        "orientation-lock"
+      ]
+    },
+    {
+      "num": "1.3.5",
+      "title": "Identify Input Purpose",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/identify-input-purpose",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "autocomplete-valid"
+      ]
+    },
+    {
+      "num": "1.3.6",
+      "title": "Identify Purpose",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/identify-purpose",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.4.1",
+      "title": "Use of Color",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/use-of-color",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "link-in-text-block",
+        "color-only-state"
+      ]
+    },
+    {
+      "num": "1.4.2",
+      "title": "Audio Control",
+      "level": "A",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/audio-control",
+      "tools": [
+        "axe-core"
+      ],
+      "rules": [
+        "no-autoplay-audio"
+      ]
+    },
+    {
+      "num": "1.4.3",
+      "title": "Contrast (Minimum)",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum",
+      "tools": [
+        "axe-core",
+        "AbleDOM",
+        "agent"
+      ],
+      "rules": [
+        "color-contrast",
+        "contrast",
+        "text-on-image-contrast"
+      ]
+    },
+    {
+      "num": "1.4.4",
+      "title": "Resize Text",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/resize-text",
+      "tools": [
+        "axe-core",
+        "agent",
+        "manual"
+      ],
+      "rules": [
+        "meta-viewport",
+        "text-resize-clipping"
+      ]
+    },
+    {
+      "num": "1.4.5",
+      "title": "Images of Text",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/images-of-text",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "image-of-text"
+      ]
+    },
+    {
+      "num": "1.4.6",
+      "title": "Contrast (Enhanced)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced",
+      "tools": [
+        "axe-core"
+      ],
+      "rules": [
+        "color-contrast-enhanced"
+      ]
+    },
+    {
+      "num": "1.4.7",
+      "title": "Low or No Background Audio",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/low-or-no-background-audio",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.4.8",
+      "title": "Visual Presentation",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/visual-presentation",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.4.9",
+      "title": "Images of Text (No Exception)",
+      "level": "AAA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/images-of-text-no-exception",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "1.4.10",
+      "title": "Reflow",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/reflow",
+      "tools": [
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "reflow-horizontal-scroll"
+      ]
+    },
+    {
+      "num": "1.4.11",
+      "title": "Non-text Contrast",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "non-text-contrast"
+      ]
+    },
+    {
+      "num": "1.4.12",
+      "title": "Text Spacing",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/text-spacing",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "avoid-inline-spacing",
+        "text-spacing-clipping"
+      ]
+    },
+    {
+      "num": "1.4.13",
+      "title": "Content on Hover or Focus",
+      "level": "AA",
+      "principle": "Perceivable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/content-on-hover-or-focus",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "tooltip-dismiss-hover"
+      ]
+    },
+    {
+      "num": "2.1.1",
+      "title": "Keyboard",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard",
+      "tools": [
+        "axe-core",
+        "AbleDOM",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "frame-focusable-content",
+        "scrollable-region-focusable",
+        "server-side-image-map",
+        "focus-lost",
+        "not-keyboard-focusable",
+        "kbd-mouse-required",
+        "kbd-programmatic-focus",
+        "kbd-not-focusable",
+        "kbd-no-activation",
+        "kbd-composite-no-arrows",
+        "apg-keyboard-support"
+      ]
+    },
+    {
+      "num": "2.1.2",
+      "title": "No Keyboard Trap",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/no-keyboard-trap",
+      "tools": [
+        "Playwright"
+      ],
+      "rules": [
+        "keyboard-trap",
+        "kbd-trap"
+      ]
+    },
+    {
+      "num": "2.1.3",
+      "title": "Keyboard (No Exception)",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/keyboard-no-exception",
+      "tools": [
+        "axe-core"
+      ],
+      "rules": [
+        "scrollable-region-focusable"
+      ]
+    },
+    {
+      "num": "2.1.4",
+      "title": "Character Key Shortcuts",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/character-key-shortcuts",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "character-key-shortcut"
+      ]
+    },
+    {
+      "num": "2.2.1",
+      "title": "Timing Adjustable",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/timing-adjustable",
+      "tools": [
+        "axe-core",
+        "manual"
+      ],
+      "rules": [
+        "meta-refresh"
+      ]
+    },
+    {
+      "num": "2.2.2",
+      "title": "Pause, Stop, Hide",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pause-stop-hide",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "blink",
+        "marquee"
+      ]
+    },
+    {
+      "num": "2.2.3",
+      "title": "No Timing",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/no-timing",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.2.4",
+      "title": "Interruptions",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/interruptions",
+      "tools": [
+        "axe-core"
+      ],
+      "rules": [
+        "meta-refresh-no-exceptions"
+      ]
+    },
+    {
+      "num": "2.2.5",
+      "title": "Re-authenticating",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/re-authenticating",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.2.6",
+      "title": "Timeouts",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/timeouts",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.3.1",
+      "title": "Three Flashes or Below Threshold",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/three-flashes-or-below-threshold",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.3.2",
+      "title": "Three Flashes",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/three-flashes",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.3.3",
+      "title": "Animation from Interactions",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/animation-from-interactions",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.4.1",
+      "title": "Bypass Blocks",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/bypass-blocks",
+      "tools": [
+        "axe-core",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "bypass",
+        "sr-no-landmarks"
+      ]
+    },
+    {
+      "num": "2.4.2",
+      "title": "Page Titled",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/page-titled",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "document-title",
+        "page-title-not-distinct"
+      ]
+    },
+    {
+      "num": "2.4.3",
+      "title": "Focus Order",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-order",
+      "tools": [
+        "AbleDOM",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "focus-lost",
+        "bad-focus",
+        "focus-not-moved-into-dialog",
+        "initial-focus-outside-overlay",
+        "focus-escapes-modal",
+        "focus-not-restored",
+        "sr-focus-not-in-dialog",
+        "sr-focus-not-returned",
+        "sr-silent-navigation",
+        "kbd-programmatic-focus",
+        "kbd-focus-lost",
+        "tab-order-reading-order"
+      ]
+    },
+    {
+      "num": "2.4.4",
+      "title": "Link Purpose (In Context)",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-in-context",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "area-alt",
+        "link-name"
+      ]
+    },
+    {
+      "num": "2.4.5",
+      "title": "Multiple Ways",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/multiple-ways",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "single-navigation-path"
+      ]
+    },
+    {
+      "num": "2.4.6",
+      "title": "Headings and Labels",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/headings-and-labels",
+      "tools": [
+        "AbleDOM",
+        "agent"
+      ],
+      "rules": [
+        "focusable-element-label",
+        "ambiguous-heading-label"
+      ]
+    },
+    {
+      "num": "2.4.7",
+      "title": "Focus Visible",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-visible",
+      "tools": [
+        "AbleDOM",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "bad-focus",
+        "focus-not-visible",
+        "focus-indicator-per-theme"
+      ]
+    },
+    {
+      "num": "2.4.8",
+      "title": "Location",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/location",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.4.9",
+      "title": "Link Purpose (Link Only)",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/link-purpose-link-only",
+      "tools": [
+        "axe-core"
+      ],
+      "rules": [
+        "identical-links-same-purpose"
+      ]
+    },
+    {
+      "num": "2.4.10",
+      "title": "Section Headings",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/section-headings",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.4.11",
+      "title": "Focus Not Obscured (Minimum)",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-minimum",
+      "tools": [
+        "Playwright"
+      ],
+      "rules": [
+        "focus-obscured"
+      ]
+    },
+    {
+      "num": "2.4.12",
+      "title": "Focus Not Obscured (Enhanced)",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-not-obscured-enhanced",
+      "tools": [
+        "Playwright"
+      ],
+      "rules": [
+        "focus-partially-obscured"
+      ]
+    },
+    {
+      "num": "2.4.13",
+      "title": "Focus Appearance",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/focus-appearance",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.5.1",
+      "title": "Pointer Gestures",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-gestures",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "drag-pointer-alternative"
+      ]
+    },
+    {
+      "num": "2.5.2",
+      "title": "Pointer Cancellation",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pointer-cancellation",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.5.3",
+      "title": "Label in Name",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/label-in-name",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "label-content-name-mismatch"
+      ]
+    },
+    {
+      "num": "2.5.4",
+      "title": "Motion Actuation",
+      "level": "A",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/motion-actuation",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.5.5",
+      "title": "Target Size (Enhanced)",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-enhanced",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.5.6",
+      "title": "Concurrent Input Mechanisms",
+      "level": "AAA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/concurrent-input-mechanisms",
+      "tools": [
+        "manual"
+      ],
+      "rules": []
+    },
+    {
+      "num": "2.5.7",
+      "title": "Dragging Movements",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/dragging-movements",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "drag-pointer-alternative"
+      ]
+    },
+    {
+      "num": "2.5.8",
+      "title": "Target Size (Minimum)",
+      "level": "AA",
+      "principle": "Operable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum",
+      "tools": [
+        "axe-core"
+      ],
+      "rules": [
+        "target-size"
+      ]
+    },
+    {
+      "num": "3.1.1",
+      "title": "Language of Page",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/language-of-page",
+      "tools": [
+        "axe-core"
+      ],
+      "rules": [
+        "html-has-lang",
+        "html-lang-valid",
+        "html-xml-lang-mismatch"
+      ]
+    },
+    {
+      "num": "3.1.2",
+      "title": "Language of Parts",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/language-of-parts",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "valid-lang"
+      ]
+    },
+    {
+      "num": "3.1.3",
+      "title": "Unusual Words",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/unusual-words",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "3.1.4",
+      "title": "Abbreviations",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/abbreviations",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "3.1.5",
+      "title": "Reading Level",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/reading-level",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "3.1.6",
+      "title": "Pronunciation",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/pronunciation",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "3.2.1",
+      "title": "On Focus",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/on-focus",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "unexpected-context-change"
+      ]
+    },
+    {
+      "num": "3.2.2",
+      "title": "On Input",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/on-input",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "unexpected-context-change"
+      ]
+    },
+    {
+      "num": "3.2.3",
+      "title": "Consistent Navigation",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-navigation",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "inconsistent-navigation-order"
+      ]
+    },
+    {
+      "num": "3.2.4",
+      "title": "Consistent Identification",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-identification",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "inconsistent-control-identification"
+      ]
+    },
+    {
+      "num": "3.2.5",
+      "title": "Change on Request",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/change-on-request",
+      "tools": [
+        "axe-core"
+      ],
+      "rules": [
+        "meta-refresh-no-exceptions"
+      ]
+    },
+    {
+      "num": "3.2.6",
+      "title": "Consistent Help",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/consistent-help",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "inconsistent-help-location"
+      ]
+    },
+    {
+      "num": "3.3.1",
+      "title": "Error Identification",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/error-identification",
+      "tools": [
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "sr-error-not-announced",
+        "error-identification-suggestion"
+      ]
+    },
+    {
+      "num": "3.3.2",
+      "title": "Labels or Instructions",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/labels-or-instructions",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "form-field-multiple-labels"
+      ]
+    },
+    {
+      "num": "3.3.3",
+      "title": "Error Suggestion",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/error-suggestion",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "error-identification-suggestion"
+      ]
+    },
+    {
+      "num": "3.3.4",
+      "title": "Error Prevention (Legal, Financial, Data)",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-legal-financial-data",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "3.3.5",
+      "title": "Help",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/help",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "3.3.6",
+      "title": "Error Prevention (All)",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/error-prevention-all",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "3.3.7",
+      "title": "Redundant Entry",
+      "level": "A",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/redundant-entry",
+      "tools": [
+        "agent"
+      ],
+      "rules": [
+        "repeated-input-request"
+      ]
+    },
+    {
+      "num": "3.3.8",
+      "title": "Accessible Authentication (Minimum)",
+      "level": "AA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-minimum",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "3.3.9",
+      "title": "Accessible Authentication (Enhanced)",
+      "level": "AAA",
+      "principle": "Understandable",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/accessible-authentication-enhanced",
+      "tools": [
+        "agent"
+      ],
+      "rules": []
+    },
+    {
+      "num": "4.1.2",
+      "title": "Name, Role, Value",
+      "level": "A",
+      "principle": "Robust",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/name-role-value",
+      "tools": [
+        "axe-core",
+        "AbleDOM",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "area-alt",
+        "aria-allowed-attr",
+        "aria-braille-equivalent",
+        "aria-command-name",
+        "aria-conditional-attr",
+        "aria-deprecated-role",
+        "aria-hidden-body",
+        "aria-hidden-focus",
+        "aria-input-field-name",
+        "aria-prohibited-attr",
+        "aria-required-attr",
+        "aria-roledescription",
+        "aria-roles",
+        "aria-tab-name",
+        "aria-toggle-field-name",
+        "aria-tooltip-name",
+        "aria-valid-attr",
+        "aria-valid-attr-value",
+        "button-name",
+        "duplicate-id-aria",
+        "frame-title",
+        "frame-title-unique",
+        "input-button-name",
+        "input-image-alt",
+        "label",
+        "link-name",
+        "nested-interactive",
+        "select-name",
+        "summary-name",
+        "focusable-element-label",
+        "focusable-in-atomic",
+        "missing-id",
+        "sr-blank-announcement",
+        "sr-control-without-name",
+        "sr-missing-role",
+        "sr-missing-state",
+        "sr-dialog-not-announced",
+        "sr-silent-action",
+        "apg-role-state"
+      ]
+    },
+    {
+      "num": "4.1.3",
+      "title": "Status Messages",
+      "level": "AA",
+      "principle": "Robust",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/status-messages",
+      "tools": [
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "sr-status-not-announced",
+        "sr-error-not-announced",
+        "status-not-announced"
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "accesskeys",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "serious",
+      "kind": "suggestion",
+      "description": "Duplicate accesskey attribute values",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "area-alt",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.4.4",
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Area element missing alt text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable",
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-allowed-attr",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Unsupported ARIA attribute used",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-allowed-role",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Inappropriate ARIA role used",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "aria-braille-equivalent",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "aria-braille missing non-braille equivalent",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-command-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "ARIA command missing accessible name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-conditional-attr",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "ARIA attribute misused for role",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-deprecated-role",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "minor",
+      "kind": "failure / review",
+      "description": "Deprecated ARIA role used",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-dialog-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "serious",
+      "kind": "suggestion",
+      "description": "Dialog missing accessible name",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "aria-hidden-body",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1",
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "aria-hidden set on body",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable",
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-hidden-focus",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Hidden element is focusable",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-input-field-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Input field missing accessible name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-meter-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Meter missing accessible name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "aria-progressbar-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Progressbar missing accessible name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "aria-prohibited-attr",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Prohibited ARIA attribute used",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-required-attr",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Required ARIA attribute missing",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-required-children",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Role missing required children",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "aria-required-parent",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Role missing required parent",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "aria-roledescription",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "roledescription on non-semantic element",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-roles",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Invalid ARIA role value",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-tab-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Tab missing accessible name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-text",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "serious",
+      "kind": "suggestion",
+      "description": "role=text has focusable descendants",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "aria-toggle-field-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Toggle field missing accessible name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-tooltip-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Tooltip missing accessible name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-treeitem-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "serious",
+      "kind": "suggestion",
+      "description": "Treeitem missing accessible name",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "aria-valid-attr",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Invalid ARIA attribute name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "aria-valid-attr-value",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Invalid ARIA attribute value",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "audio-caption",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.2.1"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Audio missing captions track",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "autocomplete-valid",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.5"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Invalid autocomplete attribute value",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "avoid-inline-spacing",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.4.12"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Inline text spacing not adjustable",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "blink",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.2.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Deprecated blink element used",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "button-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Button missing discernible text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "bypass",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.4.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "No way to bypass blocks",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "color-contrast",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.4.3"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Insufficient text color contrast",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "color-contrast-enhanced",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.4.6"
+      ],
+      "severity": "serious",
+      "kind": "suggestion",
+      "description": "Insufficient enhanced color contrast",
+      "modality": "",
+      "levels": [
+        "AAA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "css-orientation-lock",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.4"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "CSS locks display orientation",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "definition-list",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Invalid definition list structure",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "dlitem",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "dt/dd not inside dl",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "document-title",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.4.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Document missing title element",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "duplicate-id-aria",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Duplicate ARIA/label id value",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "empty-heading",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Heading has no text",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "empty-table-header",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Table header text empty",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "focus-order-semantics",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Focus order element wrong role",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "form-field-multiple-labels",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "3.3.2"
+      ],
+      "severity": "moderate",
+      "kind": "failure / review",
+      "description": "Form field has multiple labels",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "frame-focusable-content",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Focusable frame has tabindex=-1",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "frame-tested",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "critical",
+      "kind": "suggestion",
+      "description": "Frame content needs review",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "frame-title",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Frame missing accessible name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "frame-title-unique",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Frame title not unique",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "heading-order",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Heading levels skip a level",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "hidden-content",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Hidden content needs review",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "html-has-lang",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "3.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "html element missing lang",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "html-lang-valid",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "3.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Invalid html lang value",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "html-xml-lang-mismatch",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "3.1.1"
+      ],
+      "severity": "moderate",
+      "kind": "failure / review",
+      "description": "lang and xml:lang mismatch",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "identical-links-same-purpose",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.4.9"
+      ],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Same-name links differ in purpose",
+      "modality": "",
+      "levels": [
+        "AAA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "image-alt",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.1.1"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Image missing alternative text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "image-redundant-alt",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Alt text repeats visible text",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "input-button-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Input button missing text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "input-image-alt",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.1.1",
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Image button missing alt text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable",
+        "Robust"
+      ]
+    },
+    {
+      "id": "label",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Form element missing a label",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "label-content-name-mismatch",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.5.3"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Accessible name omits visible text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "label-title-only",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "serious",
+      "kind": "suggestion",
+      "description": "Label is not visible",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "landmark-banner-is-top-level",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Banner nested in landmark",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "landmark-complementary-is-top-level",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Aside nested in landmark",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "landmark-contentinfo-is-top-level",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Contentinfo nested in landmark",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "landmark-main-is-top-level",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Main nested in landmark",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "landmark-no-duplicate-banner",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Multiple banner landmarks present",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "landmark-no-duplicate-contentinfo",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Multiple contentinfo landmarks present",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "landmark-no-duplicate-main",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Multiple main landmarks present",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "landmark-one-main",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Page missing main landmark",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "landmark-unique",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Landmarks not uniquely identified",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "link-in-text-block",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.4.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Link distinguishable only by color",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "link-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.4.4",
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Link missing discernible text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable",
+        "Robust"
+      ]
+    },
+    {
+      "id": "list",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Invalid list markup structure",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "listitem",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "li not inside ul/ol",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "marquee",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.2.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Deprecated marquee element used",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "meta-refresh",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.2.1"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Page auto-refreshes under 20 hours",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "meta-refresh-no-exceptions",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.2.4",
+        "3.2.5"
+      ],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Page uses delayed refresh",
+      "modality": "",
+      "levels": [
+        "AAA"
+      ],
+      "principles": [
+        "Operable",
+        "Understandable"
+      ]
+    },
+    {
+      "id": "meta-viewport",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.4.4"
+      ],
+      "severity": "moderate",
+      "kind": "failure / review",
+      "description": "Zooming and scaling disabled",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "meta-viewport-large",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Cannot zoom text to 500%",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "nested-interactive",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Interactive controls are nested",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "no-autoplay-audio",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.4.2"
+      ],
+      "severity": "moderate",
+      "kind": "failure / review",
+      "description": "Audio or video autoplays",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "object-alt",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Object missing alternative text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "p-as-heading",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Paragraph styled as heading",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "page-has-heading-one",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Page missing level-one heading",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "presentation-role-conflict",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Presentational role inconsistently ignored",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "region",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Content outside any landmark",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "role-img-alt",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "role=img missing alt text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "scope-attr-valid",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Incorrect table scope attribute",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "scrollable-region-focusable",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.1.1",
+        "2.1.3"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Scrollable region not keyboard accessible",
+      "modality": "",
+      "levels": [
+        "A",
+        "AAA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "select-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Select missing accessible name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "server-side-image-map",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.1.1"
+      ],
+      "severity": "minor",
+      "kind": "failure / review",
+      "description": "Server-side image map used",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "skip-link",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Skip link target missing",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "summary-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Summary element missing text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "svg-img-alt",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "SVG image missing alt text",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "tabindex",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "serious",
+      "kind": "suggestion",
+      "description": "Positive tabindex value used",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "table-duplicate-name",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Table summary duplicates caption",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "table-fake-caption",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Data cell used as caption",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "target-size",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "2.5.8"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Touch target too small",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "td-has-header",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Data cell missing header",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "td-headers-attr",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "headers attribute references wrong cell",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "th-has-data-cells",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Header not referencing data cells",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "valid-lang",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "3.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Invalid lang attribute value",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "video-caption",
+      "section": "axe-core rules",
+      "tool": "axe-core",
+      "sc": [
+        "1.2.2"
+      ],
+      "severity": "critical",
+      "kind": "failure / review",
+      "description": "Video missing captions",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "focusable-element-label",
+      "section": "AbleDOM rules",
+      "tool": "AbleDOM",
+      "sc": [
+        "4.1.2",
+        "2.4.6"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Focusable element has no label",
+      "modality": "",
+      "levels": [
+        "A",
+        "AA"
+      ],
+      "principles": [
+        "Robust",
+        "Operable"
+      ]
+    },
+    {
+      "id": "focusable-in-atomic",
+      "section": "AbleDOM rules",
+      "tool": "AbleDOM",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Focusable element nested in control",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "contrast",
+      "section": "AbleDOM rules",
+      "tool": "AbleDOM",
+      "sc": [
+        "1.4.3"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Insufficient text contrast",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "missing-id",
+      "section": "AbleDOM rules",
+      "tool": "AbleDOM",
+      "sc": [
+        "1.3.1",
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "ARIA reference targets missing id",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable",
+        "Robust"
+      ]
+    },
+    {
+      "id": "focus-lost",
+      "section": "AbleDOM rules",
+      "tool": "AbleDOM",
+      "sc": [
+        "2.4.3",
+        "2.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Keyboard focus lost on change",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "bad-focus",
+      "section": "AbleDOM rules",
+      "tool": "AbleDOM",
+      "sc": [
+        "2.4.7",
+        "2.4.3"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Focus moved to invisible element",
+      "modality": "",
+      "levels": [
+        "A",
+        "AA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "tabindex-non-interactive",
+      "section": "AbleDOM rules",
+      "tool": "AbleDOM",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "tabindex on non-interactive element",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "focus-not-moved-into-dialog",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.4.3"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Focus not moved into dialog",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "initial-focus-outside-overlay",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.4.3"
+      ],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Focus not moved into a non-modal overlay (popover, menu, drawer, non-modal dialog) on open",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "focus-not-visible",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.4.7"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "No visible focus indicator",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "keyboard-trap",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure",
+      "description": "Keyboard focus is trapped",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "focus-escapes-modal",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.4.3"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Focus leaves modal dialog",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "focus-obscured",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.4.11"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Focused element fully hidden",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "focus-partially-obscured",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.4.12"
+      ],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Focused element partly hidden",
+      "modality": "",
+      "levels": [
+        "AAA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "not-keyboard-focusable",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Interactive element not focusable",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "escape-does-not-close",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Escape does not close overlay",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "focus-not-restored",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.4.3"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Focus lost when overlay closes",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "focus-not-returned-to-trigger",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "suggestion",
+      "description": "Focus not returned to trigger",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "reflow-horizontal-scroll",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "1.4.10"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Horizontal scroll at 320px",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "text-spacing-clipping",
+      "section": "Custom Playwright checks",
+      "tool": "Playwright",
+      "sc": [
+        "1.4.12"
+      ],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Text clipped with text spacing",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "sr-blank-announcement",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Focused element announced as \"blank\" or unlabelled",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "sr-control-without-name",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Control announced without a name",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "sr-missing-role",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Focusable element announced without a role",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "sr-missing-state",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "moderate",
+      "kind": "failure",
+      "description": "Expanded/pressed/checked/selected state not announced",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "sr-dialog-not-announced",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Dialog opened without being announced",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "sr-focus-not-in-dialog",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "2.4.3"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Focus not moved into the opened dialog (review for non-modal dialogs)",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "sr-focus-not-returned",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "2.4.3"
+      ],
+      "severity": "moderate",
+      "kind": "failure / review",
+      "description": "Focus not returned after the dialog closed",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "sr-status-not-announced",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "4.1.3"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Status message not announced",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "sr-error-not-announced",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "3.3.1",
+        "4.1.3"
+      ],
+      "severity": "serious",
+      "kind": "failure / review",
+      "description": "Validation error not announced (review when inferred from an id/class)",
+      "modality": "",
+      "levels": [
+        "A",
+        "AA"
+      ],
+      "principles": [
+        "Understandable",
+        "Robust"
+      ]
+    },
+    {
+      "id": "sr-silent-action",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Action produced no announcement",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "sr-silent-navigation",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "2.4.3"
+      ],
+      "severity": "moderate",
+      "kind": "review / failure",
+      "description": "Navigation produced no announcement (failure, 2.4.2, when the page has no title)",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "sr-duplicate-announcement",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Duplicated announcement",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "sr-verbose",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Very long announcement (over 160 characters)",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "sr-symbol-noise",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "1.1.1"
+      ],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Emoji or icon-font glyph in the announcement",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "sr-reading-order",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "1.3.2"
+      ],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Reading order differs from visual order",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "sr-no-landmarks",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "2.4.1"
+      ],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "No main landmark",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "sr-no-headings",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [
+        "1.3.1"
+      ],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "No headings",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "srnav-not-reachable",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Element not found with reader navigation (point to verify)",
+      "modality": "sr-navigation",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "srnav-no-semantic-nav",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Headings/landmarks exist but none announced",
+      "modality": "sr-navigation",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "srnav-focus-mode-required",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [],
+      "severity": "minor",
+      "kind": "review",
+      "description": "Browse mode could not be confirmed while reading",
+      "modality": "sr-navigation",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "sr-autofocus-focus-mode",
+      "section": "Screen reader checks (Guidepup)",
+      "tool": "Guidepup",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Editable field autofocused, reader starts in focus mode",
+      "modality": "sr-keyboard, sr-navigation",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "kbd-mouse-required",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.1.1"
+      ],
+      "severity": "critical",
+      "kind": "failure",
+      "description": "Step can only be completed with a mouse",
+      "modality": "keyboard",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "kbd-programmatic-focus",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.1.1",
+        "2.4.3"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Reachable only by moving focus programmatically",
+      "modality": "keyboard",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "kbd-not-focusable",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Interactive element cannot receive focus",
+      "modality": "keyboard",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "kbd-trap",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.1.2"
+      ],
+      "severity": "critical",
+      "kind": "failure",
+      "description": "Keyboard focus trapped",
+      "modality": "keyboard",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "kbd-no-activation",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Enter/Space does not activate the focused control",
+      "modality": "keyboard",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "kbd-composite-no-arrows",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.1.1"
+      ],
+      "severity": "serious",
+      "kind": "failure",
+      "description": "Composite widget items not reachable with arrows (catalogued, not emitted yet)",
+      "modality": "keyboard",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "kbd-focus-lost",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [
+        "2.4.3"
+      ],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Focus lost after activation (catalogued, not emitted yet)",
+      "modality": "keyboard",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "kbd-hover-only",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Content may be hover-only",
+      "modality": "keyboard",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "kbd-programmatic-intervention",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "A script was needed to continue the journey",
+      "modality": "keyboard",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "kbd-search-inconclusive",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Press limit reached, inconclusive",
+      "modality": "keyboard",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "kbd-activation-unobserved",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Activation produced no observable change",
+      "modality": "keyboard",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "kbd-step-skipped",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [],
+      "severity": "moderate",
+      "kind": "review",
+      "description": "Step skipped for this modality",
+      "modality": "keyboard",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "kbd-nonstandard-key",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Navigation relies on keys outside the allowed set",
+      "modality": "keyboard",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "kbd-unexpected-autofocus",
+      "section": "Interaction modality checks",
+      "tool": "Playwright",
+      "sc": [],
+      "severity": "minor",
+      "kind": "suggestion",
+      "description": "Editable field takes focus on load (catalogued, not emitted yet)",
+      "modality": "keyboard",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "apg-keyboard-support",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "2.1.1"
+      ],
+      "severity": "",
+      "kind": "failure",
+      "description": "Missing required keyboard support",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "apg-role-state",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "4.1.2"
+      ],
+      "severity": "",
+      "kind": "failure",
+      "description": "Wrong or missing ARIA state",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "apg-optional-behaviour",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [],
+      "severity": "",
+      "kind": "suggestion",
+      "description": "Optional APG pattern behaviour missing",
+      "modality": "",
+      "levels": [
+        "best practice"
+      ],
+      "principles": []
+    },
+    {
+      "id": "tab-order-reading-order",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "1.3.2",
+        "2.4.3"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Tab order skips reading order",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable",
+        "Operable"
+      ]
+    },
+    {
+      "id": "color-only-state",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "1.4.1"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "State shown by color alone",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "text-on-image-contrast",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "1.4.3"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Text over image low contrast",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "image-of-text",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "1.4.5"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Image used instead of text",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "non-text-contrast",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "1.4.11"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Borders or icons low contrast",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "ambiguous-heading-label",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "2.4.6"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Heading or label not descriptive",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "focus-indicator-per-theme",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "2.4.7"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Focus indicator missing in theme",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "orientation-lock",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "1.3.4"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Content locked to one orientation",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "text-resize-clipping",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "1.4.4"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Clipping at 200 percent zoom",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "tooltip-dismiss-hover",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "1.4.13"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Tooltip not dismissible or hoverable",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Perceivable"
+      ]
+    },
+    {
+      "id": "character-key-shortcut",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "2.1.4"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Single-key shortcut not remappable",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "drag-pointer-alternative",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "2.5.1",
+        "2.5.7"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Drag action lacks button alternative",
+      "modality": "",
+      "levels": [
+        "A",
+        "AA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "unexpected-context-change",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "3.2.1",
+        "3.2.2"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Focus or input changes context",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "error-identification-suggestion",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "3.3.1",
+        "3.3.3"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Error not named or suggested",
+      "modality": "",
+      "levels": [
+        "A",
+        "AA"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "status-not-announced",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "4.1.3"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Status update not announced",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Robust"
+      ]
+    },
+    {
+      "id": "page-title-not-distinct",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "2.4.2"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Page title not descriptive",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "single-navigation-path",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "2.4.5"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Only one way to page",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Operable"
+      ]
+    },
+    {
+      "id": "inconsistent-navigation-order",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "3.2.3"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Navigation order changes between pages",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "inconsistent-control-identification",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "3.2.4"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Same control named differently",
+      "modality": "",
+      "levels": [
+        "AA"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "inconsistent-help-location",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "3.2.6"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Help location changes between pages",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    },
+    {
+      "id": "repeated-input-request",
+      "section": "Agent (manual review) checks",
+      "tool": "agent",
+      "sc": [
+        "3.3.7"
+      ],
+      "severity": "",
+      "kind": "review",
+      "description": "Flow asks for data twice",
+      "modality": "",
+      "levels": [
+        "A"
+      ],
+      "principles": [
+        "Understandable"
+      ]
+    }
+  ],
+  "patterns": [
+    {
+      "slug": "accordion",
+      "name": "Accordion (Sections With Show/Hide Functionality)",
+      "summary": "An accordion is a vertically stacked set of interactive headings that each contain a title, content snippet, or thumbnail representing a section of content.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "alert",
+      "name": "Alert",
+      "summary": "An alert is an element that displays a brief, important message in a way that attracts the user's attention without interrupting the user's task.",
+      "tools": [
+        "axe-core",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "alertdialog",
+      "name": "Alert and Message Dialogs",
+      "summary": "An alert dialog is a modal dialog that interrupts the user's workflow to communicate an important message and acquire a response.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "breadcrumb",
+      "name": "Breadcrumb",
+      "summary": "A breadcrumb trail consists of a list of links to the parent pages of the current page in hierarchical order.",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "button",
+      "name": "Button",
+      "summary": "A button is a widget that enables users to trigger an action or event, such as submitting a form, opening a dialog, canceling an action, or performing a delete operation.",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "carousel",
+      "name": "Carousel (Slide Show or Image Rotator)",
+      "summary": "A carousel presents a set of items, referred to as slides, by sequentially displaying a subset of one or more slides.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "checkbox",
+      "name": "Checkbox",
+      "summary": "WAI-ARIA supports two types of checkbox widgets: dual-state checkboxes toggle between two choices -- checked and not checked -- and tri-state checkboxes, which allow an additional third state known as partially checked.",
+      "tools": [
+        "axe-core",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "combobox",
+      "name": "Combobox",
+      "summary": "A combobox is an input widget that has an associated popup.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "dialog-modal",
+      "name": "Dialog (Modal)",
+      "summary": "A dialog is a window overlaid on either the primary window or another dialog window.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "disclosure",
+      "name": "Disclosure (Show/Hide)",
+      "summary": "A disclosure is a widget that enables content to be either collapsed (hidden) or expanded (visible).",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "feed",
+      "name": "Feed",
+      "summary": "A feed is a section of a page that automatically loads new sections of content as the user scrolls.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "grid",
+      "name": "Grid (Interactive Tabular Data and Layout Containers)",
+      "summary": "A grid widget is a container that enables users to navigate the information or interactive elements it contains using directional navigation keys, such as arrow keys, Home, and End.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "landmarks",
+      "name": "Landmarks",
+      "summary": "Landmarks are a set of eight roles that identify the major sections of a page.",
+      "tools": [
+        "axe-core",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "link",
+      "name": "Link",
+      "summary": "A link widget provides an interactive reference to a resource.",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "listbox",
+      "name": "Listbox",
+      "summary": "A listbox widget presents a list of options and allows a user to select one or more of them.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "menubar",
+      "name": "Menu and Menubar",
+      "summary": "A menu is a widget that offers a list of choices to the user, such as a set of actions or functions.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "menu-button",
+      "name": "Menu Button",
+      "summary": "A menu button is a button that opens a menu as described in the Menu and Menubar Pattern.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "meter",
+      "name": "Meter",
+      "summary": "A meter is a graphical display of a numeric value that varies within a defined range.",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "radio",
+      "name": "Radio Group",
+      "summary": "A radio group is a set of checkable buttons, known as radio buttons, where no more than one of the buttons can be checked at a time.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "slider",
+      "name": "Slider",
+      "summary": "A slider is an input where the user selects a value from within a given range.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "slider-multithumb",
+      "name": "Slider (Multi-Thumb)",
+      "summary": "A multi-thumb slider implements the Slider Pattern but includes two or more thumbs, often on a single rail.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "spinbutton",
+      "name": "Spinbutton",
+      "summary": "A spinbutton is an input widget that restricts its value to a set or range of discrete values.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "switch",
+      "name": "Switch",
+      "summary": "A switch is an input widget that allows users to choose one of two values: on or off.",
+      "tools": [
+        "axe-core",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "table",
+      "name": "Table",
+      "summary": "Like an HTML table element, a WAI-ARIA table is a static tabular structure containing one or more rows that each contain one or more cells; it is not an interactive widget.",
+      "tools": [
+        "axe-core",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "tabs",
+      "name": "Tabs",
+      "summary": "Tabs are a set of layered sections of content, known as tab panels, that display one panel of content at a time.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "toolbar",
+      "name": "Toolbar",
+      "summary": "A toolbar is a container for grouping a set of controls, such as buttons, menubuttons, or checkboxes.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "tooltip",
+      "name": "Tooltip",
+      "summary": "A tooltip is a popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "treeview",
+      "name": "Tree View",
+      "summary": "A tree view widget presents a hierarchical list.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "Guidepup",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "treegrid",
+      "name": "Treegrid",
+      "summary": "A treegrid widget presents a hierarchical data grid consisting of tabular information that is editable or interactive.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    },
+    {
+      "slug": "windowsplitter",
+      "name": "Window Splitter",
+      "summary": "A window splitter is a moveable separator between two sections, or panes, of a window that enables users to change the relative size of the panes.",
+      "tools": [
+        "axe-core",
+        "Playwright",
+        "agent"
+      ],
+      "rules": [
+        "apg-keyboard-support",
+        "apg-role-state",
+        "apg-optional-behaviour"
+      ]
+    }
+  ]
+}
