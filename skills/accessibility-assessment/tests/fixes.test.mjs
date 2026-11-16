@@ -7,7 +7,7 @@ import { test } from 'node:test';
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { freshDir, runFixes, SKILL_DIR } from './helpers.mjs';
+import { freshDir, writeResults, runFixes, SKILL_DIR } from './helpers.mjs';
 
 const TARGET = {
   key: 'demo__default__desktop',
@@ -28,7 +28,7 @@ function baseResults(findings) {
 
 function writeRun(dir, { findings, annotations }) {
   fs.mkdirSync(dir, { recursive: true });
-  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(baseResults(findings), null, 2));
+  writeResults(dir, baseResults(findings));
   if (annotations) fs.writeFileSync(path.join(dir, 'annotations.json'), JSON.stringify(annotations, null, 2));
   return dir;
 }
@@ -153,7 +153,7 @@ test('fixes: a change that drops text an inventory step locates by is flagged wi
   writeRun(dir, { findings, annotations: { 'label-content-name-mismatch': { reviewed: true, changes: [{ file: path.relative(SKILL_DIR, src).split(path.sep).join('/'), line: 1, proposed: '<button>Store</button>' }] } } });
   const results = JSON.parse(fs.readFileSync(path.join(dir, 'results.json'), 'utf8'));
   results.config.inventory = { file: 'inventory.json', sha256: 'x' };
-  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(results));
+  writeResults(dir, results);
   const { stdout } = await runFixes(dir);
   assert.match(stdout, /1 ready, 0 draft/);
   assert.match(stdout, /changes text an inventory step uses \("Save draft"\)/, 'a shorter name contained in a longer string is not flagged');

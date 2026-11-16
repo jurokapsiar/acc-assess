@@ -6,37 +6,42 @@ scratch/review artifact between `intent` and `ground`.
 
 ## `intent.json` (`scope.mjs intent`, `work/intent.json`)
 
-The deterministic, pure parse of the prompt (no LLM call) - a baseline the agent may hand-edit
-and re-validate with `scope.mjs intent --from <edited.json>`.
+**The agent interprets the prompt and writes this file; no script parses prose.** Get a skeleton
+with `scope.mjs intent --session <s> --template`, fill it in, then run
+`scope.mjs intent --session <s> --from <intent.json>`. `--from` is required (exit 3 without it).
+The script only validates the schema (`validateIntent`).
 
 ```jsonc
 {
-  "prompt": "…",
+  "prompt": "…",                                  // must equal the session prompt verbatim
   "include": [                                    // what to find
-    { "phrase": "invite dialog", "kind": "screen|state|feature|flow|any", "quoted": false }
+    { "phrase": "invite dialog", "kind": "screen|state|feature|flow|any", "quoted": false,
+      "evidence": "the invite dialog" }           // verbatim prompt substring, or {"assumption": "…"}
   ],
-  "quotedStrings": ["Send invite"],              // literal UI text from "…"/“…”
-  "states": ["validation-error", "dark"],        // normalized via a synonym table
-  "viewports": ["mobile"],                       // from words: mobile/phone/narrow/desktop/wide/all
-  "exclude": [{ "phrase": "submit", "reason": "prompt: don't submit anything" }],
-  "actionPolicy": { "forbid": ["submit", "delete", "purchase", "send", "sign out"],
-                    "allowEvaluate": false, "allowStorage": false,
-                    "requestedDestructive": [] },
+  "states": ["validation-error", "dark"],        // free strings (inventory state ids / labels)
+  "viewports": ["mobile"],                       // free strings (inventory viewport names)
+  "modalities": ["keyboard"],                    // subset of keyboard|mouse|sr-keyboard|sr-navigation
+  "excludedModalities": [{ "modality": "sr-keyboard", "evidence": "no screen readers" }],
+  "unsupportedModalities": ["touch"],            // asked for but not automatable
+  "exclude": [{ "phrase": "billing page", "reason": "user excluded it", "evidence": "not the billing page" }],
+  "actionPolicy": { "requestedDestructive": [{ "verb": "delete", "evidence": "delete a project" }],
+                    "allowEvaluate": false, "allowStorage": false },
   "changedFiles": [],                            // filled from --base/--changed/--diff
   "limits": { "maxTargets": 40, "maxJourneySteps": 25, "maxExploreActions": 60 }
 }
 ```
 
-- `include[].kind` is a hint only (`screen` for dialog/modal/popover/menu/drawer/page/screen/view/
-  panel/toast words, `flow` for flow/journey/wizard/step words, `state` for "state(s)",
-  `feature` for feature/section words, `any` otherwise) - grounding uses it to prefer matching
-  candidate kinds, it never filters them out.
-- `exclude[]` comes from leading negation cues (`not`, `without`, `exclude`, `except`, `don't`,
-  `skip`) binding to the clause that follows; only that clause is excluded, not the whole prompt.
-- `actionPolicy.forbid` is every destructive verb (`submit, delete, remove, purchase, buy, pay,
-  send, sign out/log out, unsubscribe, deactivate, destroy, erase, wipe, archive, publish,
-  checkout, cancel`) **except** ones the prompt explicitly asks for (those move to
-  `requestedDestructive` and are removed from `forbid` - the proposal then warns about them).
+- `evidence` is required on `include`, `exclude`, `excludedModalities`, `requestedDestructive`, and
+  on `allowEvaluate`/`allowStorage` when true (`allowEvaluateEvidence` / `allowStorageEvidence`).
+  It is matched case- and whitespace-insensitively against the prompt. Anything inferred rather than
+  said must use `{"assumption": "…"}`; assumptions are listed in `proposal.md` under
+  "Interpretation assumptions" so the human approver can correct them.
+- `quotedStrings` is derived by the validator from `include[].quoted`.
+- `include[].kind` is a hint only; grounding uses it to prefer matching candidate kinds.
+- A modality cannot be both `modalities` and `excludedModalities`.
+- `actionPolicy.forbid` is computed: every destructive verb (`submit, delete, remove, purchase, buy,
+  pay, send, sign out/log out, unsubscribe, deactivate, destroy, erase, wipe, archive, publish,
+  checkout, cancel`) **except** those in `requestedDestructive` (the proposal warns about them).
 - `limits` bound a single session's size; exceeding one is a blocker, not a silent truncation.
 
 ## `scope.json` (`scope.mjs propose` / `confirm` / `verify`)
@@ -161,12 +166,11 @@ Rules:
 Every field below is optional. A journey with none of them behaves exactly as before
 (modality `unspecified`).
 
-- `intent.json.modalities` / `scope.json.modalities`: parsed from the request (`keyboard only`,
-  `without a mouse` → `keyboard`; `mouse`, `pointer`, `click` → `mouse`; `screen reader`, `NVDA`,
-  `VoiceOver` → `sr-keyboard`; `quick nav`, `rotor`, `elements list`, `browse mode` →
-  `sr-navigation`; `all input` → all four). Negation removes one ("not with the mouse"); quoted
-  labels are ignored. `intent.json.unsupportedModalities` lists what was asked but cannot be
-  automated (`touch`, `swipe`, `stylus`); the proposal discloses it and it is never mapped to `mouse`.
+- `intent.json.modalities` / `scope.json.modalities`: chosen by the agent from the
+  request (ids: `keyboard`, `mouse`, `sr-keyboard`, `sr-navigation`), each backed by evidence.
+  Modalities the user ruled out go to `excludedModalities`. `intent.json.unsupportedModalities`
+  lists what was asked but cannot be automated (e.g. touch); the proposal discloses it and it is
+  never mapped to `mouse`.
   `propose` copies the intent's modalities onto every journey that declares none.
 - `journey.modalities`: array of `keyboard | mouse | sr-keyboard | sr-navigation`; set with
   `step --modalities`. The compiler copies it onto steps that declare none.

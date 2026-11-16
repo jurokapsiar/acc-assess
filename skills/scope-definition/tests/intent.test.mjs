@@ -1,106 +1,76 @@
-// scope-skill-spec §17 item 1 (unit, pure): quoted strings, negation binding, state/viewport
-// synonyms, destructive verbs -> actionPolicy.forbid.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseIntent, normalizeIntent } from '../scripts/lib/intent.mjs';
+import { validateIntent, intentTemplate, DESTRUCTIVE_VERBS } from '../scripts/lib/intent.mjs';
 
-test('parseIntent: extracts quoted strings and keeps them verbatim in include phrases', () => {
-  const intent = parseIntent('open the "Invite member" dialog and check its fields');
-  assert.deepEqual(intent.quotedStrings, ['Invite member']);
-  const withQuote = intent.include.find((i) => i.phrase.includes('Invite member'));
-  assert.ok(withQuote, 'a clause referencing the quoted phrase is kept');
-  assert.equal(withQuote.quoted, false, 'the clause as a whole is not a bare quoted phrase (it has surrounding words)');
+const PROMPT = 'check the "Invite member" dialog with NVDA, no screen readers on the billing page';
+const base = (extra = {}) => ({
+  prompt: PROMPT,
+  include: [{ phrase: 'Invite member', kind: 'screen', quoted: true, evidence: '"Invite member" dialog' }],
+  exclude: [],
+  ...extra,
 });
 
-test('parseIntent: a clause that is only the quoted phrase is marked quoted:true', () => {
-  const intent = parseIntent('"Invite member"');
-  assert.equal(intent.include.length, 1);
-  assert.equal(intent.include[0].quoted, true);
-  assert.equal(intent.include[0].phrase, 'Invite member');
-});
-
-test('parseIntent: leading negation cues move a clause to exclude, not include', () => {
-  const intent = parseIntent('check the settings screen; not the billing screen');
-  assert.equal(intent.include.length, 1);
-  assert.match(intent.include[0].phrase, /settings screen/);
-  assert.equal(intent.exclude.length, 1);
-  assert.match(intent.exclude[0].phrase, /billing screen/);
-  assert.match(intent.exclude[0].reason, /not the billing screen/);
-});
-
-test('parseIntent: "without" and "except" also bind as negation, excluding only their own clause', () => {
-  const intent = parseIntent('validate the checkout flow, except the payment screen');
-  assert.equal(intent.exclude.length, 1);
-  assert.match(intent.exclude[0].phrase, /payment screen/);
-  assert.ok(intent.include.some((i) => /checkout flow/.test(i.phrase)), 'the earlier, non-negated clause stays in include');
-});
-
-test('parseIntent: recognizes state synonyms (dark mode, validation error, empty) across clauses', () => {
-  const intent = parseIntent('check the form in dark mode with a validation error, and the empty state list');
-  assert.deepEqual(new Set(intent.states), new Set(['dark', 'validation-error', 'empty']));
-});
-
-test('parseIntent: recognizes viewport words (mobile/desktop) and drops pure-modifier clauses from include', () => {
-  const intent = parseIntent('check the profile page; mobile');
-  assert.deepEqual(intent.viewports, ['mobile']);
-  assert.equal(intent.include.length, 1, 'the standalone "mobile" clause is a modifier, not a target to find');
-  assert.match(intent.include[0].phrase, /profile page/);
-});
-
-test('parseIntent: a destructive verb mentioned in the prompt is removed from the default forbid list and recorded', () => {
-  const intent = parseIntent('delete a project and check the confirmation dialog');
-  assert.ok(!intent.actionPolicy.forbid.includes('delete'), '"delete" was explicitly requested, so it is allowed');
-  assert.deepEqual(intent.actionPolicy.requestedDestructive, ['delete']);
-  assert.ok(intent.actionPolicy.forbid.includes('submit'), 'verbs never mentioned stay forbidden');
-});
-
-test('parseIntent: destructive verbs not mentioned in the prompt all stay forbidden, and evaluate/storage default to disallowed', () => {
-  const intent = parseIntent('check the dashboard screen');
-  assert.ok(intent.actionPolicy.forbid.includes('delete'));
-  assert.ok(intent.actionPolicy.forbid.includes('submit'));
-  assert.equal(intent.actionPolicy.allowEvaluate, false);
-  assert.equal(intent.actionPolicy.allowStorage, false);
-});
-
-test('normalizeIntent: rejects an unknown state/viewport synonym and a non-positive limit', () => {
-  const { errors } = normalizeIntent({
-    prompt: 'x',
-    include: [],
-    exclude: [],
-    states: ['not-a-real-state'],
-    viewports: ['not-a-real-viewport'],
-    limits: { maxTargets: 0, maxJourneySteps: 10, maxExploreActions: 10 },
-  });
-  assert.ok(errors.some((e) => /unknown state synonym/.test(e)));
-  assert.ok(errors.some((e) => /unknown viewport word/.test(e)));
-  assert.ok(errors.some((e) => /maxTargets/.test(e)));
-});
-
-test('normalizeIntent: a valid, round-tripped parseIntent() output normalizes with no errors', () => {
-  const original = parseIntent('check the dark mode settings screen on mobile');
-  const { errors, intent } = normalizeIntent(original);
+test('validateIntent: a well-formed agent intent passes and derives quotedStrings + forbid', () => {
+  const { errors, intent } = validateIntent(base(), { prompt: PROMPT });
   assert.deepEqual(errors, []);
-  assert.deepEqual(intent.states, original.states);
-  assert.deepEqual(intent.viewports, original.viewports);
+  assert.deepEqual(intent.quotedStrings, ['Invite member']);
+  assert.equal(intent.actionPolicy.forbid.length, DESTRUCTIVE_VERBS.length);
+  assert.equal(intent.actionPolicy.allowEvaluate, false);
 });
 
-test('parseIntent: modality words map to modalities; the request is not turned into a screen phrase', () => {
-  assert.deepEqual(parseIntent('keyboard only').modalities, ['keyboard']);
-  assert.deepEqual(parseIntent('the invite dialog without a mouse').modalities, ['keyboard']);
-  assert.deepEqual(parseIntent('the invite dialog with NVDA and quick nav').modalities, ['sr-keyboard', 'sr-navigation']);
-  assert.deepEqual(parseIntent('the invite dialog, all input').modalities.length, 4);
+test('validateIntent: prompt must equal the session prompt', () => {
+  const { errors } = validateIntent({ ...base(), prompt: 'something else' }, { prompt: PROMPT });
+  assert.ok(errors.some((e) => /session prompt/.test(e)));
 });
 
-test('parseIntent: negation removes a modality; quoted labels are ignored; touch is disclosed, never mapped', () => {
-  const neg = parseIntent('the invite dialog, not with the mouse, and keyboard');
-  assert.deepEqual(neg.modalities, ['keyboard']);
-  assert.deepEqual(parseIntent('open the "Mouse settings" page').modalities, []);
-  const touch = parseIntent('the invite dialog by touch');
-  assert.deepEqual(touch.modalities, []);
-  assert.deepEqual(touch.unsupportedModalities, ['touch']);
+test('validateIntent: evidence must be verbatim (case/whitespace-insensitive) or an explicit assumption', () => {
+  const bad = validateIntent(base({ include: [{ phrase: 'x', kind: 'any', evidence: 'not in the prompt' }] }), { prompt: PROMPT });
+  assert.ok(bad.errors.some((e) => /not a substring/.test(e)));
+  const missing = validateIntent(base({ include: [{ phrase: 'x', kind: 'any' }] }), { prompt: PROMPT });
+  assert.ok(missing.errors.some((e) => /evidence is required/.test(e)));
+  const ok = validateIntent(base({ include: [{ phrase: 'x', kind: 'any', evidence: 'THE   billing  PAGE' }, { phrase: 'y', kind: 'any', evidence: { assumption: 'user meant the invite flow' } }] }), { prompt: PROMPT });
+  assert.deepEqual(ok.errors, []);
+  assert.deepEqual(ok.assumptions, ['include "y": user meant the invite flow']);
 });
 
-test('normalizeIntent: an unknown modality is rejected', () => {
-  const { errors } = normalizeIntent({ ...parseIntent('keyboard only'), modalities: ['gamepad'] });
-  assert.ok(errors.some((e) => /unknown modality/.test(e)));
+test('validateIntent: states and viewports are free strings (no synonym table)', () => {
+  const { errors, intent } = validateIntent(base({ states: ['kanban-collapsed'], viewports: ['foldable'] }), { prompt: PROMPT });
+  assert.deepEqual(errors, []);
+  assert.deepEqual(intent.states, ['kanban-collapsed']);
+});
+
+test('validateIntent: "no screen readers" is expressed as an excluded modality, never a requested one', () => {
+  const doc = base({ modalities: ['sr-keyboard'], excludedModalities: [{ modality: 'sr-keyboard', evidence: 'no screen readers' }] });
+  const { errors } = validateIntent(doc, { prompt: PROMPT });
+  assert.ok(errors.some((e) => /both requested and excluded/.test(e)));
+  const ok = validateIntent(base({ modalities: ['keyboard'], excludedModalities: [{ modality: 'sr-keyboard', evidence: 'no screen readers' }] }), { prompt: PROMPT });
+  assert.deepEqual(ok.errors, []);
+  assert.equal(ok.intent.excludedModalities[0].modality, 'sr-keyboard');
+});
+
+test('validateIntent: unknown modality ids and excluded modalities without evidence are rejected', () => {
+  assert.ok(validateIntent(base({ modalities: ['gamepad'] }), { prompt: PROMPT }).errors.some((e) => /unknown modality/.test(e)));
+  assert.ok(validateIntent(base({ excludedModalities: [{ modality: 'mouse' }] }), { prompt: PROMPT }).errors.some((e) => /evidence is required/.test(e)));
+});
+
+test('validateIntent: requested destructive verbs need evidence and are removed from forbid', () => {
+  const p = 'delete a project and check the confirmation dialog';
+  const mk = (e) => ({ prompt: p, include: [{ phrase: 'confirmation dialog', kind: 'screen', evidence: 'confirmation dialog' }], exclude: [], actionPolicy: { requestedDestructive: [e] } });
+  const ok = validateIntent(mk({ verb: 'delete', evidence: 'delete a project' }), { prompt: p });
+  assert.deepEqual(ok.errors, []);
+  assert.ok(!ok.intent.actionPolicy.forbid.includes('delete'));
+  assert.ok(ok.intent.actionPolicy.forbid.includes('submit'));
+  assert.ok(validateIntent(mk('delete'), { prompt: p }).errors.some((e) => /needs evidence/.test(e)));
+});
+
+test('validateIntent: allowEvaluate/allowStorage default false and true requires evidence; limits must be positive', () => {
+  assert.ok(validateIntent(base({ actionPolicy: { allowEvaluate: true } }), { prompt: PROMPT }).errors.some((e) => /allowEvaluate/.test(e)));
+  assert.ok(validateIntent(base({ limits: { maxTargets: 0 } }), { prompt: PROMPT }).errors.some((e) => /limits\.maxTargets/.test(e)));
+});
+
+test('intentTemplate: carries the session prompt and no interpretation', () => {
+  const t = intentTemplate(PROMPT);
+  assert.equal(t.prompt, PROMPT);
+  assert.deepEqual(t.modalities, []);
+  assert.deepEqual(t.states, []);
 });

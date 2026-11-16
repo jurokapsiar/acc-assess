@@ -5,7 +5,7 @@
 // the URL and the focused element's role/name. Only browser code in this skill besides replay.
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadInventoryLib, loadStepsLib, launchChromium } from './deps.mjs';
+import { loadInventoryLib, loadStepsLib, openBrowserSession, importSiblingLib } from './deps.mjs';
 import { applyDraftOverlay } from './journeys.mjs';
 import { claimSeq } from './session.mjs';
 
@@ -84,7 +84,7 @@ async function focusedRoleName(page) {
  * Returns the recorded exploration `{ n, plan, url, snapshot, shot, focused, ambiguous }` and
  * writes `snapshots/<n>.yml` + `shots/<n>.png` under `workDir`.
  */
-export async function explore({ appRoot, workDir, session, screen, state, url, steps, viewport, headed, channel }) {
+export async function explore({ appRoot, workDir, session, screen, state, url, steps, viewport, headed, channel, setup, cdp }) {
   const { loadInventory, resolveTargets } = await loadInventoryLib();
   const { runStep } = await loadStepsLib();
 
@@ -115,20 +115,32 @@ export async function explore({ appRoot, workDir, session, screen, state, url, s
     throw new Error('explore needs --screen (with optional --state) or --url');
   }
 
-  const browser = await launchChromium({ channel, headed });
+  const browserSession = await openBrowserSession({ channel, headed, setup, cdp });
+  const { appendStep, probeFocus, STEPS_FILE } = await importSiblingLib('steps-log.mjs');
+  const stepsFile = path.join(workDir, STEPS_FILE);
+  fs.mkdirSync(workDir, { recursive: true });
   const ambiguous = [];
   let page;
   try {
-    const context = await browser.newContext({ viewport: vp.width ? { width: vp.width, height: vp.height } : vp });
+    const context = await browserSession.newContext({ viewport: vp.width ? { width: vp.width, height: vp.height } : vp }, { key: `explore:${screen ?? url}` });
     page = await context.newPage();
-    for (const st of plan) {
+    for (const [i, st] of plan.entries()) {
       if (st.target) {
         // Counted right before this step runs (not up-front against the plan's starting page),
         // so earlier navigation/clicks have already happened.
         const count = await rawLocator(page, st.target).count().catch(() => -1);
         if (count !== 1) ambiguous.push({ step: st, count });
       }
-      await runStep(page, st);
+      let outcome = 'ok';
+      try {
+        await runStep(page, st);
+      } catch (err) {
+        outcome = 'error';
+        appendStep(stepsFile, { target: `explore:${screen ?? url}`, step: i, action: st.action, pageUrl: page.url(), focused: 'none', outcome, note: String(err.message).split('\n')[0] });
+        throw err;
+      }
+      const fp = await probeFocus(page);
+      appendStep(stepsFile, { target: `explore:${screen ?? url}`, step: i, action: st.action, key: st.key ?? null, pageUrl: page.url(), focused: fp.focused, outcome: fp.outcome === 'ok' ? outcome : fp.outcome });
     }
     const snapshot = await snapshotBody(page);
     const focused = await focusedRoleName(page);
@@ -141,9 +153,9 @@ export async function explore({ appRoot, workDir, session, screen, state, url, s
     const shotFile = path.join(shotDir, `${n}.png`);
     fs.writeFileSync(snapFile, typeof snapshot === 'string' ? snapshot : JSON.stringify(snapshot, null, 2));
     await page.screenshot({ path: shotFile });
-    const record = { n, plan, url: page.url(), snapshot: path.relative(appRoot, snapFile).split(path.sep).join('/'), shot: path.relative(appRoot, shotFile).split(path.sep).join('/'), focused, ambiguous };
+    const record = { n, plan, url: page.url(), snapshot: path.relative(appRoot, snapFile).split(path.sep).join('/'), shot: path.relative(appRoot, shotFile).split(path.sep).join('/'), focused, ambiguous, stepsLog: path.relative(appRoot, stepsFile).split(path.sep).join('/') };
     return record;
   } finally {
-    await browser.close();
+    await browserSession.close();
   }
 }

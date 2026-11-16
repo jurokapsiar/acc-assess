@@ -48,7 +48,9 @@ test('target: --bail stops starting targets after one is unreachable', async () 
   for (const f of inv.features) for (const s of f.screens) if (s.id === 'contrast') s.steps = [{ action: 'evaluate', script: 'throw new Error("unreachable")' }];
   const invPath = writeInventory(inv, freshDir('target-bail-inv'));
   const { results, stdout } = await runAssess({ inventory: invPath, screen: 'contrast', viewport: 'desktop,mobile', checks: 'axe', out: freshDir('target-bail'), extraArgs: ['--bail', '--workers', '1'] });
-  assert.equal(results.targets.length, 1);
+  assert.equal(results.targets.length, 2);
   assert.equal(results.targets[0].status, 'error');
-  assert.match(stdout, /--bail: stopped after an unreachable target; 1 target\(s\) not run/);
+  assert.equal(results.targets[1].status, 'not-attempted');
+  assert.match(results.targets[1].reason, /--bail/);
+  assert.match(stdout, /stopped after an unreachable target; 1 target\(s\) not run/);
 });

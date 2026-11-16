@@ -313,6 +313,12 @@ export function decide({ fixMeta, configCheck, baseline, after, afterRunRelPath 
     return finish('regressed', `${regressions.length} new failure${regressions.length === 1 ? '' : 's'} on affected target(s)`, { nodes: nodesOut, regressions, counts });
   }
 
+  // A run that was not a fresh context (attached browser, shared context/page, setup interventions) can't prove a fix.
+  const ex = after.execution;
+  if (ex && (ex.isolation !== 'fresh-context' || (ex.interventions?.length ?? 0) > 0)) {
+    return finish('unverified', `the verification run was not a fresh browser context (isolation: ${ex.isolation}, ${ex.interventions?.length ?? 0} intervention(s)); it can only be partial evidence`, { nodes: nodesOut, counts });
+  }
+
   // Rule 6: needs review - review/agent-sourced issue with no recorded agent verdict yet.
   if (fixMeta.kind === 'review' || fixMeta.source === 'agent') {
     const verdict = agentVerdict?.[fixMeta.issue] ?? null;
@@ -364,7 +370,7 @@ export function findRegressions({ fixMeta, baseline, after, affectedKeys, afterR
     const at = afterTargets.get(key);
     if (!bt || !at) continue;
     const baselineFailures = baselineFailuresByTarget.get(key) ?? [];
-    const afterFailures = (after.findings ?? []).filter((f) => f.target === key && f.kind === 'failure');
+    const afterFailures = (after.findings ?? []).filter((f) => f.target === key && f.kind === 'failure' && (f.scopeSignal ?? 'in') === 'in');
     for (const f of afterFailures) {
       const checkName = checkNameFor(f.source, f.context?.phase ?? 'main');
       const afterOk = at.checks?.[checkName]?.status === 'ok';

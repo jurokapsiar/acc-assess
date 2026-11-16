@@ -8,8 +8,9 @@
 // issues with an example source location, config/engines and the fix files with their status.
 import fs from 'node:fs';
 import path from 'node:path';
-import { groupFindings, mergeAgentInput } from './lib/findings.mjs';
+import { groupFindings, mergeAgentInput, isOutOfScope } from './lib/findings.mjs';
 import { loadCriteria, scInfo } from './lib/wcag.mjs';
+import { loadRunInputs } from './lib/results.mjs';
 
 const KINDS = ['failure', 'review', 'suggestion'];
 const args = parseArgs(process.argv.slice(2));
@@ -23,9 +24,7 @@ if (!fs.existsSync(resultsPath)) {
   console.error(`No results.json in ${runDir}`);
   process.exit(1);
 }
-const results = JSON.parse(fs.readFileSync(resultsPath, 'utf8'));
-const extra = readJson(path.join(runDir, 'agent-findings.json'), []);
-const annotations = readJson(path.join(runDir, 'annotations.json'), {});
+const { results, extra, annotations } = loadRunInputs(runDir);
 const criteria = loadCriteria();
 
 const list = (v) => (v ? String(v).split(',').map((s) => s.trim()).filter(Boolean) : null);
@@ -37,8 +36,10 @@ const targets = (results.targets ?? []).filter((t) => !screens || screens.includ
 const keep = (f) => (!rules || rules.includes(f.rule)) && (!screens || screens.includes(screenOf(f.target)));
 
 const all = mergeAgentInput(results.findings ?? [], extra, {});
-const merged = mergeAgentInput(results.findings ?? [], extra, annotations).filter(keep);
-const dismissed = all.filter(keep).length - merged.length;
+const mergedAll = mergeAgentInput(results.findings ?? [], extra, annotations).filter(keep);
+const merged = mergedAll.filter((f) => !isOutOfScope(f));
+const outOfScope = mergedAll.filter(isOutOfScope);
+const dismissed = all.filter(keep).length - mergedAll.length;
 const occurrences = (f) => Math.max(1, f.nodes?.length ?? 0);
 
 const count = (key) => {
@@ -89,9 +90,10 @@ const summary = {
   filters: { rule: rules, screen: screens },
   config: { level: results.config?.level ?? results.level ?? null, checks: results.config?.checks ?? [], viewports: results.config?.viewports ?? {}, git: results.config?.git ?? null },
   engines: results.config?.engines ?? results.engines ?? {},
-  targets: { total: targets.length, ok: targets.filter((t) => t.status === 'ok').length, errors: targets.filter((t) => t.status !== 'ok').map((t) => ({ key: t.key, error: t.error ?? t.status })) },
+  targets: { total: targets.length, ok: targets.filter((t) => t.status === 'ok').length, errors: targets.filter((t) => t.status !== 'ok').map((t) => ({ key: t.key, status: t.status, error: t.error ?? t.reason ?? t.status })) },
   kinds: Object.fromEntries(KINDS.map((k) => [k, merged.filter((f) => f.kind === k).reduce((n, f) => n + occurrences(f), 0)])),
   dismissed,
+  outOfScope: { total: outOfScope.length, scopeUnreviewed: outOfScope.filter((f) => f.scopeUnreviewed).length },
   byRule: count((f) => f.rule ?? f.title),
   byScreen: count((f) => screenOf(f.target)),
   byTarget: count((f) => f.target),
@@ -111,6 +113,7 @@ if (args.json) {
   if (rules || screens) lines.push(`filter: ${[rules && `rule=${rules.join(',')}`, screens && `screen=${screens.join(',')}`].filter(Boolean).join(' ')}`);
   lines.push(`targets: ${summary.targets.ok}/${summary.targets.total} reached${summary.targets.errors.length ? ` (errors: ${summary.targets.errors.map((e) => `${e.key}: ${e.error}`).join('; ')})` : ''}`);
   lines.push(`occurrences (element × target): ${kcell(summary.kinds)}${dismissed ? ` · ${dismissed} dismissed finding(s)` : ''}`);
+  if (summary.outOfScope.total) lines.push(`potentially out of scope: ${summary.outOfScope.total} finding(s), excluded above · scopeUnreviewed: ${summary.outOfScope.scopeUnreviewed}${summary.outOfScope.scopeUnreviewed ? ' (set scope in annotations.json before delivery)' : ''}`);
   lines.push('', 'Failed criteria:');
   for (const c of summary.failedCriteria) lines.push(`  ${c.sc}${c.title ? ` ${c.title}` : ''}${c.level ? ` (${c.level})` : ''}: ${c.occurrences}`);
   if (!summary.failedCriteria.length) lines.push('  none');

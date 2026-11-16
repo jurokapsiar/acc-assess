@@ -25,6 +25,7 @@ import { resolveSourceRoot } from './lib/source.mjs';
 import { abledomVersion } from './lib/abledom.mjs';
 import { parseFixFile, checkConfig, checksFor, decide, exitCodeFor, policyChanged } from './lib/verify.mjs';
 import { loadCriteria, scInfo } from './lib/wcag.mjs';
+import { validateResults } from './lib/results.mjs';
 import { groupFindings } from './lib/findings.mjs';
 import { fixReportHtml, scLink as scLinkImpl } from './lib/render.mjs';
 
@@ -67,8 +68,12 @@ function verifyOne({ meta, fixFilePath, fixFileDir, baselineDir }) {
     return 'unverified';
   }
   const baseline = JSON.parse(fs.readFileSync(baselineResultsPath, 'utf8'));
+  const baselineErrors = validateResults(baseline, { runDir: baselineDir }).errors;
+  if (baselineErrors.length) {
+    console.error(`${meta.issue ?? path.basename(fixFilePath)}: baseline results.json is invalid:\n- ${baselineErrors.slice(0, 20).join('\n- ')}`);
+    process.exit(1);
+  }
   const affectedKeys = (meta.targets ?? []).map((t) => t.key);
-
   // Scope pass-through (scope-definition skill, §10 of its spec): a scoped baseline is
   // re-verified with the SAME scope file, never a silent fallback to the bare inventory.
   // Missing scope file -> unverified (not "configCheck not ok", which would mix it up with
@@ -134,6 +139,11 @@ function verifyOne({ meta, fixFilePath, fixFileDir, baselineDir }) {
 
   const afterResultsPath = path.join(verifyRunDir, 'results.json');
   const after = JSON.parse(fs.readFileSync(afterResultsPath, 'utf8'));
+  const afterErrors = validateResults(after, { runDir: verifyRunDir }).errors;
+  if (afterErrors.length) {
+    console.error(`${meta.issue}: the verify run's results.json is invalid:\n- ${afterErrors.slice(0, 20).join('\n- ')}`);
+    process.exit(1);
+  }
   const afterRunRelPath = normalizeSlashes(path.relative(baselineDir, afterResultsPath));
   const agentVerdictsPath = path.join(verifyRunDir, 'agent-verdicts.json');
   const agentVerdict = fs.existsSync(agentVerdictsPath) ? JSON.parse(fs.readFileSync(agentVerdictsPath, 'utf8')) : null;
@@ -224,6 +234,8 @@ function runAssessSubprocess({ invPath, affectedKeys, meta, checksList, baseline
   const mods = [...new Set((meta.targets ?? []).flatMap((t) => (t.nodes ?? []).map((n) => n.modality).filter(Boolean)))];
   if (mods.length) cliArgs.push('--modality', mods.join(','));
   if (args.channel) cliArgs.push('--channel', String(args.channel));
+  if (args.setup) cliArgs.push('--setup', String(args.setup));
+  if (args.cdp) cliArgs.push('--cdp', String(args.cdp));
   if (args.headed) cliArgs.push('--headed');
   if (args.workers) cliArgs.push('--workers', String(args.workers));
 

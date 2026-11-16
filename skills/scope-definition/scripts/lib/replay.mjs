@@ -4,7 +4,7 @@
 // and every step target's `count()` was 1 when it ran. Writes `work/verify/<key>.png`.
 import fs from 'node:fs';
 import path from 'node:path';
-import { loadInventoryLib, loadStepsLib, loadScopeLib, launchChromium } from './deps.mjs';
+import { loadInventoryLib, loadStepsLib, loadScopeLib, openBrowserSession } from './deps.mjs';
 
 /** Un-clamped locator for ambiguity counting: same source selection as `steps.mjs locate()`,
  * but never calls `.first()`/`.nth()` so `count()` reflects the raw match set (mirrors
@@ -48,7 +48,7 @@ async function checkReadyAndScope(page, target) {
  * `{ results, status }` where `results[key] = { status, planHash, reason?, failingStep? }` and
  * overall `status` is `"verified"` only when every target is `verified` (else `"partial"`).
  */
-export async function verifyTargets({ appRoot, inv, scope, targets, viewportFilter, workDir, headed, channel }) {
+export async function verifyTargets({ appRoot, inv, scope, targets, viewportFilter, workDir, headed, channel, setup, cdp }) {
   const { resolveTargets, planHash } = await loadInventoryLib();
   const { runStep, describeStep } = await loadStepsLib();
   const { applyScope } = await loadScopeLib();
@@ -62,17 +62,19 @@ export async function verifyTargets({ appRoot, inv, scope, targets, viewportFilt
   const verifyDir = workDir ? path.join(workDir, 'verify') : null;
   if (verifyDir) fs.mkdirSync(verifyDir, { recursive: true });
 
-  const browser = await launchChromium({ channel, headed });
+  const session = await openBrowserSession({ channel, headed, setup, cdp });
+  const execution = session.execution;
   try {
     for (const target of resolved) {
       const result = { planHash: planHash(target) };
       try {
         const storageState = scope.storageState ? path.resolve(path.dirname(scope.__file ?? appRoot), scope.storageState) : undefined;
-        const context = await browser.newContext({
+        const context = await session.newContext({
           viewport: { width: target.viewport.width, height: target.viewport.height },
           ...(storageState && fs.existsSync(storageState) ? { storageState } : {}),
-        });
+        }, target);
         const page = await context.newPage();
+        await session.beforeTarget({ context, page, target });
         const ambiguousSteps = [];
         const done = [];
         try {
@@ -92,6 +94,7 @@ export async function verifyTargets({ appRoot, inv, scope, targets, viewportFilt
         }
         const check = await checkReadyAndScope(page, target);
         if (verifyDir) await page.screenshot({ path: path.join(verifyDir, `${target.key}.png`) }).catch(() => {});
+        await session.afterTarget({ context, page, target, status: check.ok ? 'reached' : 'unreachable' });
         await context.close();
         if (!check.ok) {
           result.status = 'unreachable';
@@ -100,6 +103,9 @@ export async function verifyTargets({ appRoot, inv, scope, targets, viewportFilt
           result.status = 'ambiguous';
           result.reason = `${ambiguousSteps.length} step target(s) matched more than one element`;
           result.failingStep = describeStep(ambiguousSteps[0].step);
+        } else if ((execution.isolation !== 'fresh-context' || execution.interventions.length > 0)) {
+          result.status = 'partial';
+          result.reason = `reached, but the run was not a fresh browser context (isolation: ${execution.isolation}, ${execution.interventions.length} intervention(s)); it cannot count as verified`;
         } else {
           result.status = 'verified';
         }
@@ -111,26 +117,32 @@ export async function verifyTargets({ appRoot, inv, scope, targets, viewportFilt
       results[target.key] = result;
     }
   } finally {
-    await browser.close();
+    await session.close();
   }
 
   const status = Object.values(results).every((r) => r.status === 'verified') ? 'verified' : 'partial';
-  return { results, status };
+  return { results, status, execution };
 }
 
 /** Read-only manual replay (§10): runs the compiled plan for one target, then pauses (headed)
  * so the agent/user can inspect. No writes. */
-export async function replayTarget({ appRoot, inv, scope, targetKey, headed = true, channel }) {
+export async function replayTarget({ appRoot, inv, scope, targetKey, headed = true, channel, setup, cdp }) {
   const { resolveTargets } = await loadInventoryLib();
   const { runPlan } = await loadStepsLib();
   const { applyScope } = await loadScopeLib();
   const { inv: overlaid, conflicts } = applyScope(inv, scope);
   if (conflicts.length) throw new Error(`Scope conflicts with inventory: ${conflicts.join('; ')}`);
   const [target] = resolveTargets(overlaid, { targets: [targetKey] });
-  const browser = await launchChromium({ channel, headed });
-  const context = await browser.newContext({ viewport: { width: target.viewport.width, height: target.viewport.height } });
-  const page = await context.newPage();
-  await runPlan(page, target.plan);
-  if (headed) await page.pause();
-  await browser.close();
+  const session = await openBrowserSession({ channel, headed, setup, cdp });
+  try {
+    const context = await session.newContext({ viewport: { width: target.viewport.width, height: target.viewport.height } }, target);
+    const page = await context.newPage();
+    await session.beforeTarget({ context, page, target });
+    await runPlan(page, target.plan);
+    if (headed) await page.pause();
+    await session.afterTarget({ context, page, target, status: 'replayed' });
+    await context.close();
+  } finally {
+    await session.close();
+  }
 }

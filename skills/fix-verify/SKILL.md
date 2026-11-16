@@ -90,6 +90,11 @@ draft the same as a reviewed fix.
    - *modality evidence gap* — a `kbd-*` fix is verified by re-running the same modality; if that
      run was blocked/partial or the step was skipped/inconclusive, the absence of a finding is
      not proof. Re-run with a higher `--max-presses`, or confirm the step manually.
+   - *not a fresh browser context* — the verification run used `--setup` with a non-fresh
+     isolation, `--cdp`, or recorded interventions (`results.execution`). That can't prove a
+     fix; re-run `verify.mjs` without them, or confirm manually. `verify.mjs` forwards
+     `--setup`/`--cdp` to the assessment subprocess.
+   - Findings the agent marked *potentially out of scope* never count as regressions.
 5. **Summarise to the user** (`node <accessibility-assessment-skill-dir>/scripts/summary.mjs <run>` lists the run's fix files and their status): how many fixed / not fixed / regressed / needs review / unverified,
    one line per issue with its reason, and the `fix-report.html` path.
 

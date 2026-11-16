@@ -32,7 +32,9 @@ Evaluate steps are flagged (`kbd-programmatic-intervention`).
 
 Run status: `complete` · `escalated` (a barrier was found, run continued) · `partial` (inconclusive
 step or escalation cap) · `blocked` (could not continue). `partial`/`blocked` exit 2; "no issues"
-is never a pass for them.
+is never a pass for them. A setup intervention (`target.addIntervention`, see the
+accessibility-assessment SKILL.md) during a run makes it `partial`. Each action is appended to
+`<run>/steps.jsonl` as it happens.
 
 ## Rules
 

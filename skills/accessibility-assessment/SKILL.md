@@ -120,6 +120,9 @@ node <skill-dir>/scripts/assess.mjs --screen settings --dry-run     # print plan
 | `--target` | — | Comma-separated target keys (`<screen>__<state>__<viewport>`), for example to re-run exactly the targets a `fix-*.md` lists. Expands to every inventory viewport first, then intersects with `--feature/--screen/--state/--viewport`. Any key that doesn't resolve aborts the whole run (exit 1), listing what didn't match — no partial runs |
 | `--scope` | — | A `scope.json` from `skills/scope-definition` (or hand-written, see `references/inventory.md`): overlays its journeys' screens/states into the inventory in memory, then assesses exactly `scope.targets` (still intersected with `--feature/--screen/--state/--viewport` if also given). A conflicting overlay aborts with nothing run; `results.json` records `scope: { file, id, sha256, journeysSha256, producers, intent }` |
 | `--storage-state` | `inventory.app.storageState` | Path to a Playwright storage-state JSON (auth cookies/localStorage), used for every `browser.newContext`. Content is never read by this skill beyond handing the path to Playwright |
+| `--setup` | — | Module with optional hooks (`launch`, `newContext`, `beforeTarget`, `afterTarget`, `teardown`, `export const isolation`) for apps that need runtime setup. See "Integrating from an app-specific skill" |
+| `--cdp` | — | Attach to an already running Chromium (loopback endpoints only). The run never closes a browser it did not launch and is disclosed as not a fresh context |
+| `--no-check` | off | `report.mjs` only: skip the rendered-report check (Chromium is launched once per render otherwise) |
 | `--level` | `AA` | `A`, `AA`, `AAA`. Criteria above the level become suggestions |
 | `--checks` | all | `axe,abledom,keyboard,overlay,reflow,text-spacing` |
 | `--source` | `auto` | `auto` resolves each finding node's source file/line (see below); `off` skips it entirely (faster, no `node.source`) |
@@ -132,6 +135,29 @@ node <skill-dir>/scripts/assess.mjs --screen settings --dry-run     # print plan
 | `--max-presses`, `--max-escalations`, `--no-escalate` | `120`, `10`, off | Keyboard search bound, escalation cap (run becomes `partial`), never fall back to mouse/focus |
 
 **Interaction modalities.** A journey step can declare how it must be operated (`keyboard`, `mouse`, `sr-keyboard`, `sr-navigation`). Needing the mouse or a programmatic focus move for a `keyboard` step is a failure (`kbd-*` rules, WCAG 2.1.1/2.1.2/2.4.3), reported like any issue, with a `fix-<issue>.md`. Details and rules: [references/modalities.md](references/modalities.md). Touch is never automated; disclose it as untested.
+
+**Results contract and gates.** `results.json` has a documented, validated shape ([references/results-schema.md](references/results-schema.md)). `assess.mjs`, `report.mjs`, `fixes.mjs`, `summary.mjs` and `verify.mjs` validate it and fail closed (exit 1, listing the problems) instead of rendering a broken report. A target that could not be reached is `error`, `blocked` or `not-attempted` with a reason; a run with any such target is a **partial run**: the report shows a banner and criteria without findings are "Not evaluated", never "No issues detected". `report.mjs` renders to a temp file, checks it in Chromium (no `[object Object]`/`undefined`/`NaN`, images load, overlay rects are finite, every rail entry selects its panel, the full-screen dialog opens and closes with Esc) and writes `report-check.json`. A failed check keeps the previous `report.html` and leaves `report.failed.html`; do not hand a report to the user unless the check passed.
+
+**Scope triage.** Every finding is checked against the requested scope: the engine marks nodes outside the screen's `scope` selector (`scopeSignal`), and the agent can override per finding with `"scope": "in" | "potentially-out"` and a `scopeNote` (required on agent findings; allowed in `annotations.json`). Potentially out-of-scope findings are not counted, not turned into fixes (unless `fixes.mjs --include-out-of-scope`) and are listed in a collapsed "Potentially out of scope" section and an optional overlay layer. `summary.mjs` reports `outOfScope.scopeUnreviewed`; it must be `0` (the agent has confirmed or overridden every automatic out-of-scope decision) before delivering results.
+
+**Integrating from an app-specific skill.** This skill is app-agnostic. An app-specific skill owns fixture discovery, mock auth, routes and proxies; it hands them over as a setup module:
+
+```js
+// my-setup.mjs   node scripts/assess.mjs --setup my-setup.mjs
+export const isolation = 'fresh-context';          // or 'shared-context' | 'reused-page'
+export async function newContext({ browser, options, target }) {
+  const context = await browser.newContext(options);
+  await context.route('**/api/**', (route) => route.continue());   // app-specific wiring goes here
+  return context;
+}
+export async function beforeTarget({ context, page, target }) {}
+export async function afterTarget({ context, page, target, status }) {}
+// target.addIntervention({ step, kind, reason }) records any setup action taken inside an assessed state
+```
+
+Rules: `--setup` cannot be combined with `--storage-state` when the module exports `newContext`. Anything other than `fresh-context`, and any recorded intervention, is written to `results.execution`, shown as a report banner, caps `verify.mjs` at `unverified` (never `fixed`) and makes modality runs with an intervention `partial`. Hook errors print the message only; cookies, headers and storage state are never logged. `scope.mjs verify|replay|explore` accept the same `--setup`/`--cdp`.
+
+**Incremental evidence.** Modality runs (and `scope.mjs explore`) append one line per action to `steps.jsonl` (`{ts, target, step, key, pageUrl, focused, outcome}`), flushed before the next action, so earlier observations survive a later failure. Focus probes time out after 1 s (`outcome: "focus-timeout"`).
 
 **Scoped runs.** To assess only a specific flow or change ("the invite dialog and its validation error", "what should we test for this PR") instead of hand-picking `--feature/--screen/--state`, use the sibling `skills/scope-definition` skill to turn a free-text request into a `scope.json` + `journeys.json` pair, then pass `--scope <scope.json>` here. `inventory.mjs list|validate|verify` accept the same flag. `fix-verify`'s `verify.mjs` re-verifies a scoped baseline with the same scope automatically — see its SKILL.md.
 
@@ -191,7 +217,7 @@ A rule with no reviewed `changes` stays a `draft` fix file: `fixes.mjs` (Step 4)
 ```jsonc
 // agent-findings.json – same shape as results.findings; kind: failure | review | suggestion
 [{
-  "target": "settings__default__desktop", "kind": "failure", "rule": "non-text-contrast",
+  "target": "settings__default__desktop", "kind": "failure", "rule": "non-text-contrast", "scope": "in",   // "in" | "potentially-out" (+ optional "scopeNote"): required
   "title": "Input borders below 3:1", "impact": "serious", "wcag": ["1.4.11"],
   "nodes": [{ "selector": "input[name=email]", "summary": "#d4d4d4 on #ffffff = 1.5:1", "screenshot": "shots/settings__default__desktop.png" }],
   "repro": ["Open /settings", "Inspect the e-mail field border"],

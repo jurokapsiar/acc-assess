@@ -101,7 +101,7 @@ in order (`init → preflighted → intent → grounded → explored → propose
 |---|---|---|
 | `init --prompt "…" [--url] [--source-root] [--base\|--changed\|--diff] [--inventory] [--viewport] [--storage-state] [--id]` | Start a session | `work/session.json` |
 | `preflight [--insecure] [--channel]` | Node/Playwright/Chromium, inventory, app reachability, source root, git ref, storageState checks | `work/preflight.json` |
-| `intent [--from <intent.json>]` | Deterministic prompt → baseline restrictions | `work/intent.json` |
+| `intent (--template \| --from <intent.json>)` | The **agent** reads the prompt and writes `intent.json` (with evidence for every claim); the script only validates the schema. `--template` prints a skeleton. Missing `--from` exits 3 | `work/intent.json` |
 | `ground [--no-source] [--no-diff] [--limit n]` | Score candidates from the inventory, source tree and diff | `work/grounding.json` |
 | `explore (--screen id [--state id] \| --url p) [--steps f] [--viewport v] [--headed]` | One bounded live probe (aria snapshot + screenshot) | `work/snapshots/`, `work/shots/` |
 | `step --journey <jid> [--checkpoint screen\|state …] [--action … --evidence …]` | Record one checkpoint/step into the session draft | session draft |
@@ -116,7 +116,7 @@ in order (`init → preflighted → intent → grounded → explored → propose
 **Modality flags on `step`** (optional; see `references/schema.md`): `--modalities keyboard,sr-keyboard`
 (sets the journey's modalities), `--intent activate|reach|…`, `--keys "Tab,Tab,Enter"` (explicit key
 script), `--modality-skip <modality> --reason "…"` (not attempted, reported for review). Modalities
-named in the request ("keyboard only", "without a mouse", "with NVDA") are parsed by `intent`, shown
+named in the request ("keyboard only", "without a mouse", "with NVDA") are recorded by the agent in `intent.json` (`modalities`; ruled-out ones in `excludedModalities`, each with prompt evidence), shown
 in `proposal.md` and inherited by journeys; "touch" is disclosed as not covered. `focus`/`evaluate`
 steps in a keyboard or screen-reader journey need `--reason` because they are reported as
 programmatic intervention. `scope.mjs verify` is unchanged (it proves reachability, not operability).
@@ -125,10 +125,19 @@ Every command takes `--session <id>` (all except `verify`/`replay`/`merge`, whic
 `--scope <file>` instead) and an optional `--app-root` (defaults to cwd). Exit codes: `0` ok,
 `1` error/blocker, `2` partial/conflict, `3` usage.
 
+## Writing the intent
+
+You interpret the request; the script does not. Read the prompt, run `intent --template`, fill in
+`include`/`exclude`/`states`/`viewports`/`modalities`/`excludedModalities`/`actionPolicy`, and run
+`intent --from`. Every claim needs `evidence` (verbatim prompt text) or `{"assumption": "…"}`;
+assumptions are shown to the approver in `proposal.md`. Negations ("no screen readers", "without a
+mouse") are `excludedModalities`, never `modalities`. States and viewports are free strings: use
+the names the inventory/app actually uses.
+
 ## Grounding guidance for the agent
 
 `scope.mjs ground` is **advisory**, not a decision-maker: it scores how well each phrase in the
-parsed intent matches inventory ids/names, source strings/routes/test ids, and diff-changed
+intent matches inventory ids/names, source strings/routes/test ids, and diff-changed
 files. The agent makes the actual call:
 
 - Read `work/grounding.json`'s `byPhrase` candidates. A phrase with one strong candidate (clearly
@@ -195,6 +204,12 @@ this one.
   anything an assertion depends on.
 - `work/` (snapshots, screenshots, session) may contain incidental PII from the live app and is
   gitignored, never transmitted anywhere beyond the local Playwright run.
+- For apps that need runtime setup (mock auth, routes, proxies), `scope.mjs verify|replay|explore`
+  accept `--setup <module.mjs>` and `--cdp <loopback endpoint>` (hooks and rules: the
+  accessibility-assessment SKILL.md, "Integrating from an app-specific skill"). A non-fresh
+  isolation or any intervention caps `verify` at `partial`: `scope.json.status` can't become
+  `verified`, and `scope.verification.execution` records how the run was set up. `explore`
+  appends each action to `work/<session>/steps.jsonl`.
 
 ## Unsupported (MVP)
 

@@ -63,6 +63,22 @@ export async function runScope(command, flags = [], { appRoot }) {
   return r;
 }
 
+/** Writes an agent-authored intent.json for `prompt` and runs `scope.mjs intent --from` on it. */
+export async function runIntent(appRoot, sessionId, prompt, overrides = {}) {
+  const file = path.join(appRoot, `intent-${sessionId}.json`);
+  const doc = {
+    prompt,
+    include: [{ phrase: prompt, kind: 'any', quoted: false, evidence: prompt }],
+    exclude: [],
+    states: [],
+    viewports: [],
+    modalities: [],
+    ...overrides,
+  };
+  fs.writeFileSync(file, JSON.stringify(doc, null, 2));
+  return runScope('intent', ['--session', sessionId, '--from', file], { appRoot });
+}
+
 export function sessionJsonPath(appRoot, id) {
   return path.join(appRoot, '.a11y', 'scopes', id, 'work', 'session.json');
 }

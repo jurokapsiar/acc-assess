@@ -28,6 +28,7 @@ export async function captureNodes(page, findings, context) {
     f.context = { phase: context.phase, viewport: context.viewport, page: context.page ?? 'live' };
     for (const node of f.nodes ?? []) {
       node.box = null;
+      node.inScope = null;
       node.identity = null;
       if (sourceMode !== 'off') node.source = null; // resolved below; `--source off` omits the key entirely
       node.probe = null; // set below when a prior applyProbes() call marked this element
@@ -39,6 +40,7 @@ export async function captureNodes(page, findings, context) {
         const data = await page.evaluate(captureNodeInPage, { selector: node.selector, scope: context.scope ?? null, probeAttr: PROBE_ATTR });
         if (data) {
           node.box = data.box;
+          node.inScope = data.inScope;
           node.identity = data.identity;
           node.probe = data.probe;
         }
@@ -51,12 +53,21 @@ export async function captureNodes(page, findings, context) {
       node.html = stripProbeAttr(node.html);
       node.selector = stripProbeAttr(node.selector);
     }
+    f.scopeSignal = scopeSignalOf(f.nodes ?? [], context.scope);
   }
   if (sourceMode !== 'off') {
     const nodes = findings.flatMap((f) => f.nodes ?? []);
     await resolveSources(page, nodes, { root: context.sourceRoot, attrs: context.sourceAttrs, cache: context.sourceCache });
   }
   return findings;
+}
+
+/** in: no scope selector or some node is inside it; out: every located node is outside; unknown: nothing could be located. */
+export function scopeSignalOf(nodes, scope) {
+  if (!scope) return 'in';
+  const known = nodes.filter((n) => typeof n.inScope === 'boolean');
+  if (!known.length) return 'unknown';
+  return known.some((n) => n.inScope) ? 'in' : 'out';
 }
 
 function stripProbeAttr(s) {
@@ -82,9 +93,11 @@ function captureNodeInPage({ selector, scope, probeAttr }) {
   const name = nameOf(el);
   const text = (el.innerText || el.textContent || '').trim().slice(0, 120);
   const root = (scope && document.querySelector(scope)) || document.body;
+  const scopeEl = scope ? document.querySelector(scope) : null;
+  const inScope = scope ? (scopeEl ? scopeEl.contains(el) : null) : null;
   const same = [...root.querySelectorAll('*')].filter((e) => e.localName === tag && roleOf(e) === role && nameOf(e) === name);
   const ordinal = Math.max(0, same.indexOf(el));
-  return { box, identity: { tag, role, name, text, ordinal, count: same.length || 1 }, probe: el.getAttribute(probeAttr) || null };
+  return { box, inScope, identity: { tag, role, name, text, ordinal, count: same.length || 1 }, probe: el.getAttribute(probeAttr) || null };
 }
 
 // ------------------------------------------------------------------ --probe relocation (T6/D10)

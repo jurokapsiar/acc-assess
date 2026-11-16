@@ -4,8 +4,9 @@
 //   <run>/agent-findings.json  -> array of extra findings (same shape as results.findings)
 //   <run>/annotations.json     -> { "<findingId|rule>": { fix, why, reviewed, changes[] } }
 //
-//   node scripts/fixes.mjs <run> [--kinds failure,review,suggestion] [--only rule,rule2]
+//   node scripts/fixes.mjs <run> [--kinds failure,review,suggestion] [--only rule,rule2] [--include-out-of-scope]
 //
+// Findings marked potentially out of scope (see report.mjs) are skipped unless --include-out-of-scope.//
 // Run from the app root (cwd), same convention as assess.mjs/report.mjs (plan header):
 // `node.source.file` on every finding node is already relative to the resolved source root,
 // and `changes[].file` in annotations.json is expected in that same convention, so this
@@ -16,7 +17,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { loadCriteria, scInfo } from './lib/wcag.mjs';
-import { groupFindings, mergeAgentInput, slug, groupId } from './lib/findings.mjs';
+import { loadRunInputs } from './lib/results.mjs';
+import { groupFindings, mergeAgentInput, isOutOfScope, slug, groupId } from './lib/findings.mjs';
 import { fileURLToPath } from 'node:url';
 import { resolveSourceRoot } from './lib/source.mjs';
 import { loadInventory, resolveTargets } from './lib/inventory.mjs';
@@ -31,12 +33,10 @@ if (!args._[0]) {
   process.exit(1);
 }
 const runDir = path.resolve(args._[0]);
-const results = JSON.parse(fs.readFileSync(path.join(runDir, 'results.json'), 'utf8'));
-const extra = readJson(path.join(runDir, 'agent-findings.json'), []);
-const annotations = readJson(path.join(runDir, 'annotations.json'), {});
+const { results, extra, annotations } = loadRunInputs(runDir);
 const criteria = loadCriteria(args.knowledge);
 
-const findings = mergeAgentInput(results.findings, extra, annotations);
+const findings = mergeAgentInput(results.findings, extra, annotations).filter((f) => args['include-out-of-scope'] || !isOutOfScope(f));
 const kindsSet = new Set(args.kinds ? String(args.kinds).split(',').map((s) => s.trim()).filter(Boolean) : ['failure', 'review', 'suggestion']);
 const onlySet = args.only ? new Set(String(args.only).split(',').map((s) => s.trim()).filter(Boolean)) : null;
 

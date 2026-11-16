@@ -4,7 +4,7 @@ import { test } from 'node:test';
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { freshDir, runFixes, runSummary } from './helpers.mjs';
+import { freshDir, writeResults, runFixes, runSummary } from './helpers.mjs';
 
 const target = (screen) => ({ key: `${screen}__default__desktop`, status: 'ok', feature: { name: 'F' }, screen: { id: screen, name: screen }, state: { name: 'Default' }, viewport: { name: 'desktop' }, planHash: 'h' });
 const node = (id, file) => ({ selector: '#' + id, html: `<button id="${id}" class="${id}">`, identity: { tag: 'button' }, screenshot: null, source: file ? { file, line: 4 } : null });
@@ -23,7 +23,7 @@ test('summary: counts, failed criteria, top issues with example source, fix file
       { id: 'F4', kind: 'review', source: 'axe', rule: 'color-contrast', wcag: ['1.4.3'], target: 'home__default__desktop', nodes: [node('e')] },
     ],
   };
-  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(results));
+  writeResults(dir, results);
   fs.writeFileSync(path.join(dir, 'annotations.json'), JSON.stringify({ region: { kind: 'dismissed' } }));
   await runFixes(dir);
 

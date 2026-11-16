@@ -195,10 +195,16 @@ function worstConfidence(steps) {
 
 /** Renders `proposal.md` (§6.5): plain-language intent echo, target matrix, numbered steps per
  * journey with confidence badges, excluded/unresolved items, and warnings. */
-export function renderProposal({ intent, targets, journeysDoc, excluded = [], unresolved = [], describeStep, modalities = [], unsupportedModalities = [] }) {
+export function renderProposal({ intent, targets, journeysDoc, excluded = [], unresolved = [], describeStep, modalities = [], unsupportedModalities = [], excludedModalities = [], assumptions = [] }) {
   const lines = [];
   lines.push(`# Scope proposal`, '', `**Intent:** ${intent}`, '');
   lines.push(`**Modalities:** ${modalities.length ? modalities.join(', ') : 'unspecified (current behaviour)'}`, '');
+  if (excludedModalities.length) lines.push(`**Excluded modalities:** ${excludedModalities.map((e) => `${e.modality} (${typeof e.evidence === 'string' ? `"${e.evidence}"` : `assumption: ${e.evidence?.assumption}`})`).join(', ')}`, '');
+  if (assumptions.length) {
+    lines.push('## Interpretation assumptions', '', 'The agent inferred these from the prompt; they are not verbatim requests. Confirm or correct them.', '');
+    for (const a of assumptions) lines.push(`- ${a}`);
+    lines.push('');
+  }
   lines.push('## Targets', '');
   lines.push('| Target | Confidence |', '|---|---|');
   for (const t of targets) lines.push(`| ${t.key} | ${t.confidence ?? '-'} |`);

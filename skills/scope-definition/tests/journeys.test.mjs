@@ -141,6 +141,17 @@ test('buildStep: validates modality fields, requires a reason for skip and for p
   assert.equal(buildStep({ ...baseStep, action: 'focus', modality: { keyboardJourney: false } }).action, 'focus');
 });
 
+test('renderProposal: lists interpretation assumptions and excluded modalities for the approver', () => {
+  const md = renderProposal({
+    intent: 'x', targets: [], journeysDoc: { journeys: [] }, describeStep: () => '',
+    assumptions: ['include "y": user meant the invite flow'],
+    excludedModalities: [{ modality: 'sr-keyboard', evidence: 'no screen readers' }],
+  });
+  assert.match(md, /Interpretation assumptions/);
+  assert.match(md, /user meant the invite flow/);
+  assert.match(md, /Excluded modalities:\*\* sr-keyboard \("no screen readers"\)/);
+});
+
 test('renderProposal: lists modalities per journey and the step intent/keys, so approval covers them', () => {
   const step = buildStep({ ...baseStep, modality: { intent: 'activate', keys: 'Tab,Enter' } });
   const md = renderProposal({

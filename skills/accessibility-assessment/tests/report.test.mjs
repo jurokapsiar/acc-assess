@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { freshDir, runReport } from './helpers.mjs';
+import { freshDir, writeResults, runReport } from './helpers.mjs';
 
 const target = (screen, viewport = 'desktop') => ({
   key: `${screen}__default__${viewport}`,
@@ -46,7 +46,7 @@ function buildResults() {
 
 test('report: summary tiles map occurrences, failed criteria and affected screens', async () => {
   const dir = freshDir('report');
-  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(buildResults()));
+  writeResults(dir, buildResults());
   const r = await runReport(dir);
   assert.equal(r.code, 0, r.stderr);
   const html = fs.readFileSync(path.join(dir, 'report.html'), 'utf8');
@@ -63,7 +63,7 @@ test('report: summary tiles map occurrences, failed criteria and affected screen
 
 test('report: sticky nav only lists sections that exist, with occurrence/criteria counts', async () => {
   const dir = freshDir('report');
-  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(buildResults()));
+  writeResults(dir, buildResults());
   await runReport(dir);
   const html = fs.readFileSync(path.join(dir, 'report.html'), 'utf8');
   assert.match(html, /<nav class="topnav"[^]*<a class="nl t-summary" href="#summary">/);
@@ -77,7 +77,7 @@ test('report: sticky nav omits a finding-kind section entirely when it has no gr
   const dir = freshDir('report');
   const results = buildResults();
   results.findings = results.findings.filter((f) => f.kind !== 'suggestion');
-  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(results));
+  writeResults(dir, results);
   await runReport(dir);
   const html = fs.readFileSync(path.join(dir, 'report.html'), 'utf8');
   assert.doesNotMatch(html, /class="nl t-suggestions"/, 'nav link omitted');
@@ -86,7 +86,7 @@ test('report: sticky nav omits a finding-kind section entirely when it has no gr
 
 test('report: Scope meters bar registers one --p-<kind> custom property rule per rail entry', async () => {
   const dir = freshDir('report');
-  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(buildResults()));
+  writeResults(dir, buildResults());
   await runReport(dir);
   const html = fs.readFileSync(path.join(dir, 'report.html'), 'utf8');
   assert.match(html, /\.scope:has\(#rv-home-default-desktop:checked\)\{--p-finding:[\d.]+;--p-tabstop:[\d.]+;--p-scope:[\d.]+\}/);
@@ -96,7 +96,7 @@ test('report: Scope meters bar registers one --p-<kind> custom property rule per
 
 test('report: no "User journeys" nav entry or section when results.journeys is absent/empty', async () => {
   const dir = freshDir('report');
-  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(buildResults()));
+  writeResults(dir, buildResults());
   await runReport(dir);
   const html = fs.readFileSync(path.join(dir, 'report.html'), 'utf8');
   assert.doesNotMatch(html, /class="nl t-journeys"/);
@@ -114,7 +114,7 @@ test('report: a populated results.journeys renders the "User journeys" section d
     title: 'Visit settings',
     screens: [{ id: 'home', name: 'Home', targetKey: 'home__default__desktop', steps: results.targets[0].steps }],
   }];
-  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(results));
+  writeResults(dir, results);
   const r = await runReport(dir);
   assert.equal(r.code, 0, r.stderr);
   const html = fs.readFileSync(path.join(dir, 'report.html'), 'utf8');

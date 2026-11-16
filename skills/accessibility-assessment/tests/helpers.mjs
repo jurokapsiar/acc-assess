@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
+import zlib from 'node:zlib';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
@@ -25,6 +26,85 @@ export function freshDir(name) {
   const dir = path.join(OUT_DIR, `${name}-${process.pid}-${++seq}`);
   fs.mkdirSync(dir, { recursive: true });
   return dir;
+}
+
+const CRC_TABLE = Array.from({ length: 256 }, (_, n) => {
+  let c = n;
+  for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+  return c >>> 0;
+});
+function crc32(buf) {
+  let c = 0xffffffff;
+  for (const b of buf) c = CRC_TABLE[(c ^ b) & 0xff] ^ (c >>> 8);
+  return (c ^ 0xffffffff) >>> 0;
+}
+function pngChunk(type, data) {
+  const len = Buffer.alloc(4);
+  len.writeUInt32BE(data.length);
+  const body = Buffer.concat([Buffer.from(type), data]);
+  const crc = Buffer.alloc(4);
+  crc.writeUInt32BE(crc32(body));
+  return Buffer.concat([len, body, crc]);
+}
+/** Solid white PNG of the given size (valid, so it decodes in a browser). */
+export function pngBuffer(width, height) {
+  const ihdr = Buffer.alloc(13);
+  ihdr.writeUInt32BE(width, 0);
+  ihdr.writeUInt32BE(height, 4);
+  ihdr[8] = 8;
+  ihdr[9] = 0;
+  const row = Buffer.alloc(width + 1, 0xff);
+  row[0] = 0;
+  const raw = Buffer.concat(Array.from({ length: height }, () => row));
+  return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), pngChunk('IHDR', ihdr), pngChunk('IDAT', zlib.deflateSync(raw)), pngChunk('IEND', Buffer.alloc(0))]);
+}
+
+/**
+ * Completes a hand-built results fixture to the results contract (schemaVersion, inventory,
+ * target status, real screenshot files, finding references on areas) and writes results.json.
+ * Fields the fixture already sets are left alone.
+ */
+export function writeResults(dir, results) {
+  const out = { schemaVersion: 1, ...results };
+  const inventory = out.inventory ?? { features: [] };
+  out.inventory = inventory;
+  const screens = new Map();
+  for (const f of inventory.features) for (const s of f.screens ?? []) screens.set(s.id, s);
+  for (const t of out.targets ?? []) {
+    t.status ??= 'ok';
+    const [ks, kst, kv] = String(t.key).split('__');
+    t.screen = { id: ks, ...t.screen };
+    t.state = { id: kst ?? 'default', ...t.state };
+    t.viewport = { name: kv ?? 'desktop', ...t.viewport };
+    if (!screens.has(t.screen.id)) {
+      const feature = inventory.features[0] ?? (inventory.features[0] = { id: t.feature?.id ?? 'f', name: t.feature?.name ?? 'F', screens: [] });
+      const s = { id: t.screen.id, name: t.screen.name ?? t.screen.id, type: 'page', parent: null, states: ['default'] };
+      feature.screens.push(s);
+      screens.set(s.id, s);
+    }
+    const s = screens.get(t.screen.id);
+    s.states = (s.states ?? []).map((x) => (typeof x === 'string' ? x : x.id));
+    if (!s.states.includes(t.state.id)) s.states.push(t.state.id);
+    if (t.status !== 'ok') continue;
+    if (t.shot && !t.screenshot) t.screenshot = t.shot.file;
+    if (!t.shot && t.screenshot) t.shot = { file: t.screenshot, width: 400, height: 300 };
+    if (!t.shot) {
+      t.screenshot = `shots/${t.key}.png`;
+      t.shot = { file: t.screenshot, width: 400, height: 300 };
+    }
+    fs.mkdirSync(path.dirname(path.join(dir, t.shot.file)), { recursive: true });
+    fs.writeFileSync(path.join(dir, t.shot.file), pngBuffer(t.shot.width, t.shot.height));
+    const mine = (out.findings ?? []).filter((f) => f.target === t.key);
+    let next = 0;
+    t.areas = (t.areas ?? []).filter((a) => {
+      if (a.kind !== 'finding' || a.finding) return true;
+      if (!mine[next]) return false;
+      a.finding = mine[next++].id;
+      return true;
+    });
+  }
+  fs.writeFileSync(path.join(dir, 'results.json'), JSON.stringify(out, null, 2));
+  return out;
 }
 
 export function loadTemplateInventory() {
@@ -105,8 +185,8 @@ export function runSummary(runDir, extraArgs = []) {
   return spawnAsync([SUMMARY_MJS, runDir, ...extraArgs]);
 }
 
-export function runReport(runDir, extraArgs = []) {
-  return spawnAsync([REPORT_MJS, runDir, ...extraArgs]);
+export function runReport(runDir, extraArgs = [], opts = {}) {
+  return spawnAsync([REPORT_MJS, runDir, ...extraArgs], { ...opts, env: { ...process.env, ...opts.env } });
 }
 
 export async function runVerify(fixFilePaths, extraArgs = []) {

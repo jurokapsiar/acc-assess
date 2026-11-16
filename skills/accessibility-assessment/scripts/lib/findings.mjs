@@ -8,8 +8,22 @@ import crypto from 'node:crypto';
 export function mergeAgentInput(findings, extra, annotations) {
   return [...findings, ...extra.map((f, i) => ({ id: f.id ?? `agent-${i + 1}`, source: 'agent', ...f }))]
     .map((f) => ({ ...f, ...(annotations[f.rule] ?? {}), ...(annotations[f.id] ?? {}) }))
-    .filter((f) => f.kind !== 'dismissed');
+    .filter((f) => f.kind !== 'dismissed')
+    .map(triageScope);
 }
+
+/**
+ * Scope triage: an explicit agent decision (`scope: in|potentially-out`) wins. Otherwise the
+ * engine's `scopeSignal` decides, and anything `out`/`unknown` is held as potentially out of
+ * scope with `scopeUnreviewed: true` until the agent reviews it.
+ */
+export function triageScope(f) {
+  if (f.scope === 'in' || f.scope === 'potentially-out') return { ...f, scopeUnreviewed: false };
+  if (!f.scopeSignal || f.scopeSignal === 'in') return { ...f, scope: 'in', scopeUnreviewed: false };
+  return { ...f, scope: 'potentially-out', scopeUnreviewed: true };
+}
+
+export const isOutOfScope = (f) => f.scope === 'potentially-out';
 
 export function groupFindings(list) {
   const groups = new Map();

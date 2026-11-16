@@ -8,7 +8,7 @@
 //   node scripts/scope.mjs init      --prompt "…" [--url] [--source-root] [--inventory]
 //                                    [--base][--changed][--diff] [--viewport][--storage-state][--id]
 //   node scripts/scope.mjs preflight --session <s> [--insecure] [--channel]
-//   node scripts/scope.mjs intent    --session <s> [--from <intent.json>]
+//   node scripts/scope.mjs intent    --session <s> (--template | --from <intent.json>)
 //   node scripts/scope.mjs ground    --session <s> [--no-source] [--no-diff] [--limit 8]
 //   node scripts/scope.mjs explore   --session <s> (--screen id [--state id] | --url p)
 //                                    [--steps f] [--viewport v] [--headed] [--channel]
@@ -30,7 +30,7 @@ import crypto from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { loadInventoryLib, loadScopeLib, loadStepsLib, launchChromium, assertSiblingInstalled, requireFromSibling } from './lib/deps.mjs';
 import { scopeDir, workDir, sessionFile, initSession, loadSession, saveSession, transitionPhase, resolveContained, writeJsonAtomic } from './lib/session.mjs';
-import { parseIntent, normalizeIntent } from './lib/intent.mjs';
+import { validateIntent, intentTemplate } from './lib/intent.mjs';
 import { groundInventory } from './lib/ground-inventory.mjs';
 import { groundSource, hasRipgrep } from './lib/ground-source.mjs';
 import { changedFilesFromGit, changedFilesFromPatch, groundDiff } from './lib/diff.mjs';
@@ -193,15 +193,17 @@ function defaultActionPolicy() {
 function cmdIntent() {
   const session = requireSession();
   transitionPhase(session, session.phase, { minPhase: 'preflighted', force: !!args.force });
-  let intent;
-  if (args.from) {
-    const doc = JSON.parse(fs.readFileSync(path.resolve(args.from), 'utf8'));
-    const { errors, intent: normalized } = normalizeIntent(doc);
-    if (errors.length) throw new Error(`Invalid intent file:\n- ${errors.join('\n- ')}`);
-    intent = normalized;
-  } else {
-    intent = parseIntent(session.prompt);
+  if (args.template) {
+    console.log(JSON.stringify(intentTemplate(session.prompt), null, 2));
+    return;
   }
+  if (!args.from) {
+    console.error('The agent interprets the prompt: write intent.json yourself, then run again with --from <intent.json>.\nUse --template to print a skeleton with the prompt filled in.');
+    process.exit(3);
+  }
+  const doc = JSON.parse(fs.readFileSync(path.resolve(args.from), 'utf8'));
+  const { errors, intent } = validateIntent(doc, { prompt: session.prompt });
+  if (errors.length) throw new Error(`Invalid intent file:\n- ${errors.join('\n- ')}`);
   if (session.diffSpec?.base || session.diffSpec?.diff) {
     const files =
       changedFilesFromGit({ cwd: appRoot, base: session.diffSpec.base, changed: session.diffSpec.changed ?? 'HEAD' }) ??
@@ -216,7 +218,7 @@ function cmdIntent() {
   saveSession(appRoot, session);
   console.log(`Wrote ${file}`);
   console.log(JSON.stringify(intent, null, 2));
-  console.log('\nReview this, edit it if needed, then re-validate with --from before "ground" (semantic matching is the agent\'s job, not this script\'s).');
+  console.log('\nIntent validated (schema only; interpreting the prompt is the agent\'s job). Next: ground.');
 }
 
 function cmdGround() {
@@ -269,6 +271,8 @@ async function cmdExplore() {
     viewport: args.viewport,
     headed: !!args.headed,
     channel: args.channel ?? session.channel,
+    setup: args.setup,
+    cdp: args.cdp,
   });
   session.explorations = session.explorations ?? [];
   session.explorations.push(record);
@@ -441,7 +445,7 @@ async function cmdPropose() {
   const scopeFile = path.join(dir, 'scope.json');
   writeJsonAtomic(scopeFile, scope);
 
-  const proposalMd = renderProposal({ intent: session.prompt, targets: resolved.map((t) => ({ key: t.key, confidence: 'proposed' })), journeysDoc, excluded, unresolved, describeStep, modalities: intentModalities, unsupportedModalities: intent.unsupportedModalities ?? [] });
+  const proposalMd = renderProposal({ intent: session.prompt, targets: resolved.map((t) => ({ key: t.key, confidence: 'proposed' })), journeysDoc, excluded, unresolved, describeStep, modalities: intentModalities, unsupportedModalities: intent.unsupportedModalities ?? [], excludedModalities: intent.excludedModalities ?? [], assumptions: intent.assumptions ?? [] });
   fs.writeFileSync(path.join(dir, 'proposal.md'), proposalMd);
 
   transitionPhase(session, 'proposed');
@@ -479,7 +483,7 @@ async function cmdVerify() {
   const inv = loadInventory(invPath);
   const viewportFilter = args.viewport && args.viewport !== 'all' ? csv(args.viewport) : null;
   const dir = path.dirname(scopeFile);
-  const { results, status, conflicts } = await verifyTargets({
+  const { results, status, conflicts, execution } = await verifyTargets({
     appRoot,
     inv,
     scope,
@@ -488,12 +492,14 @@ async function cmdVerify() {
     workDir: path.join(dir, 'work'),
     headed: !!args.headed,
     channel: args.channel,
+    setup: args.setup,
+    cdp: args.cdp,
   });
   if (conflicts) {
     console.error(`Scope conflicts with inventory:\n- ${conflicts.join('\n- ')}`);
     process.exit(1);
   }
-  scope.verification = { at: new Date().toISOString(), results };
+  scope.verification = { at: new Date().toISOString(), results, ...(execution ? { execution } : {}) };
   scope.status = status === 'verified' ? 'verified' : 'partial';
   const unresolvedKeys = Object.entries(results).filter(([, r]) => r.status !== 'verified').map(([k]) => k);
   scope.unresolved = [...(scope.unresolved ?? []).filter((u) => !u.target), ...unresolvedKeys.map((k) => ({ target: k, status: results[k].status, reason: results[k].reason }))];
@@ -519,7 +525,7 @@ async function cmdReplay() {
   scope.__file = scopeFile;
   const { loadInventory } = await loadInventoryLib();
   const inv = loadInventory(path.resolve(path.dirname(scopeFile), scope.inventory));
-  await replayTarget({ appRoot, inv, scope, targetKey: args.target, headed: args.headed !== 'false', channel: args.channel });
+  await replayTarget({ appRoot, inv, scope, targetKey: args.target, headed: args.headed !== 'false', channel: args.channel, setup: args.setup, cdp: args.cdp });
 }
 
 async function cmdMerge() {

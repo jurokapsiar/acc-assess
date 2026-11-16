@@ -8,6 +8,7 @@
 //        [--workers 2] [--channel msedge] [--headed] [--max-tabs 40] [--dry-run]
 //        [--source auto|off] [--source-root <dir>] [--probe <file.json>] [--bail]
 //        [--scope <scope.json>] [--storage-state <file>]
+//        [--setup <module.mjs>] [--cdp <loopback endpoint>]
 //        [--modality keyboard,mouse] [--max-presses 120] [--max-escalations 10] [--no-escalate]
 import fs from 'node:fs';
 import path from 'node:path';
@@ -28,6 +29,9 @@ import { gitInfo } from './lib/git.mjs';
 import { resolveSourceRoot } from './lib/source.mjs';
 import { MODALITIES, KEYBOARD_LIKE, guardSurface, makeObserver, runKeyboardStep } from './lib/modality.mjs';
 import { MODALITY_RULES } from './lib/modality-rules.mjs';
+import { createBrowserSession } from './lib/browser-setup.mjs';
+import { STEPS_FILE, appendStep, probeFocus } from './lib/steps-log.mjs';
+import { createResults, addTarget, addFindings, finalizeResults, validateResults } from './lib/results.mjs';
 
 const require = createRequire(import.meta.url);
 const args = parseArgs(process.argv.slice(2));
@@ -135,15 +139,16 @@ if (storageStateAbs && !fs.existsSync(storageStateAbs)) {
 }
 
 const bundle = checks.has('abledom') ? await abledomBundle() : null;
-let browser;
+let session;
 try {
-  browser = await chromium.launch({ headless: !args.headed, channel: args.channel });
+  session = await createBrowserSession({ chromium, headed: !!args.headed, channel: args.channel, setupPath: args.setup, cdp: args.cdp });
+  if (storageStateAbs && session.hasNewContext) throw new Error('--setup provides newContext, so --storage-state / inventory storageState cannot also be used');
 } catch (err) {
   console.error(`Cannot launch browser: ${err.message.split('\n')[0]}\nRun \`npx playwright install chromium\` in the skill folder or pass --channel msedge|chrome.`);
   process.exit(1);
 }
 
-const results = {
+const results = createResults({
   standard: `WCAG 2.2 ${level}`,
   level,
   app: { name: inv.app.name, baseUrl: inv.app.baseUrl },
@@ -156,45 +161,64 @@ const results = {
   inventory: inventoryTree(inv),
   selection: { feature: args.feature ?? null, screen: args.screen ?? null, state: args.state ?? null, viewport: args.viewport ?? null, scope: scope?.id ?? null },
   scope: scope ? buildScopeSummary() : null,
+  execution: session.execution,
   startedAt: new Date().toISOString(),
-  targets: [],
-  findings: [],
-  coverage: [],
-};
+});
 const coverage = new Set();
 // --bail (internal, passed by verify.mjs): once a target can't be reached, don't start the
 // remaining ones - their results can't change the attempt's "unverified" outcome.
 let bailed = false;
 
-await pool(targets, Number(args.workers ?? 2), async (t) => {
+// Ancestor screens run first, and a target waits for the (already started) targets of its
+// ancestor screens on the same viewport: if one of them could not be reached, the dependent
+// target is `blocked` (not run), not a second, redundant error.
+const screenDepth = (s) => (s.parent ? 1 + screenDepth(screenById(inv, s.parent)) : 0);
+const ancestorIds = (s) => (s.parent ? [s.parent, ...ancestorIds(screenById(inv, s.parent))] : []);
+const runOrder = targets.map((t, i) => ({ t, i })).sort((a, b) => screenDepth(a.t.screen) - screenDepth(b.t.screen) || a.i - b.i).map((x) => x.t);
+const settled = new Map();
+
+await pool(runOrder, Number(args.workers ?? 2), async (t) => {
   if (bailed) return;
   const started = Date.now();
-  const res = await assessTarget(t).catch((err) => ({ target: { ...summary(t), status: 'error', error: err.message }, findings: [] }));
-  results.targets.push(res.target);
-  results.findings.push(...res.findings);
+  const deps = ancestorIds(t.screen).flatMap((id) => runOrder.filter((o) => o.screen.id === id && o.state.id === 'default' && o.viewport.name === t.viewport.name).map((o) => o.key));
+  const depResults = await Promise.all(deps.filter((k) => settled.has(k)).map((k) => settled.get(k)));
+  const failedDep = depResults.find((r) => r.target.status === 'error' || r.target.status === 'blocked');
+  const promise = failedDep
+    ? Promise.resolve({ target: { ...summary(t), status: 'blocked', blockedBy: failedDep.target.key, reason: `prerequisite target ${failedDep.target.key} was not reached${failedDep.target.error ? `: ${failedDep.target.error}` : ''}` }, findings: [] })
+    : assessTarget(t).catch((err) => ({ target: { ...summary(t), status: 'error', error: err.message }, findings: [] }));
+  settled.set(t.key, promise);
+  const res = await promise;
+  const mine = session.execution.interventions.filter((i) => i.target === t.key);
+  if (mine.length) res.target.interventions = mine;
+  if (fs.existsSync(path.join(runDir, STEPS_FILE))) res.target.stepsLog = STEPS_FILE;
+  addTarget(results, res.target);
+  addFindings(results, res.findings);
   if (args.bail && res.target.status === 'error') bailed = true;
   const fails = res.findings.filter((f) => f.kind === 'failure').length;
-  console.log(`${res.target.status === 'error' ? '✗' : '✓'} ${t.key}  ${fails} failures  ${((Date.now() - started) / 1000).toFixed(1)}s${res.target.error ? `  (${res.target.error})` : ''}`);
+  console.log(`${res.target.status === 'ok' ? '✓' : '✗'} ${t.key}  ${res.target.status === 'blocked' ? 'blocked' : `${fails} failures`}  ${((Date.now() - started) / 1000).toFixed(1)}s${res.target.error || res.target.reason ? `  (${res.target.error ?? res.target.reason})` : ''}`);
 });
-await browser.close();
-if (bailed) console.log(`--bail: stopped after an unreachable target; ${targets.length - results.targets.length} target(s) not run`);
+await session.close();
+if (bailed) {
+  const ran = new Set(results.targets.map((x) => x.key));
+  const failed = results.targets.find((x) => x.status === 'error');
+  for (const t of targets) if (!ran.has(t.key)) addTarget(results, { ...summary(t), status: 'not-attempted', reason: `--bail: stopped after ${failed?.key ?? 'an unreachable target'}` });
+  console.log(`--bail: stopped after an unreachable target; ${targets.length - ran.size} target(s) not run`);
+}
 
 const order = new Map(targets.map((t, i) => [t.key, i]));
-results.targets.sort((a, b) => order.get(a.key) - order.get(b.key));
-results.findings.sort((a, b) => order.get(a.target) - order.get(b.target));
-results.findings.forEach((f, i) => (f.id = `F${String(i + 1).padStart(4, '0')}`));
-// `areas[].finding` held a reference to the (not-yet-id'd) finding object; resolve it now.
-for (const t of results.targets) {
-  for (const a of t.areas ?? []) {
-    if (a.finding && typeof a.finding === 'object') a.finding = a.finding.id;
-  }
-}
+finalizeResults(results, order);
 results.coverage = [...coverage];
 results.modalities = [...new Set(results.targets.flatMap((t) => (t.modalityRuns ?? []).map((r) => r.modality)))];
 results.journeys = buildJourneys();
 results.finishedAt = new Date().toISOString();
+const { errors: resultErrors } = validateResults(results, { runDir });
+if (resultErrors.length) {
+  fs.writeFileSync(path.join(runDir, 'results.invalid.json'), JSON.stringify(results, null, 2));
+  console.error(`The assessment produced an invalid results.json; it was saved as ${path.join(runDir, 'results.invalid.json')} and no report was rendered:\n- ${resultErrors.slice(0, 40).join('\n- ')}`);
+  process.exit(1);
+}
 fs.writeFileSync(path.join(runDir, 'results.json'), JSON.stringify(results, null, 2));
-execFileSync(process.execPath, [path.join(path.dirname(fileURLToPath(import.meta.url)), 'report.mjs'), runDir, ...(args.knowledge ? ['--knowledge', args.knowledge] : [])], { stdio: 'inherit' });
+execFileSync(process.execPath, [path.join(path.dirname(fileURLToPath(import.meta.url)), 'report.mjs'), runDir, ...(args.knowledge ? ['--knowledge', args.knowledge] : []), ...(args.channel ? ['--channel', args.channel] : [])], { stdio: 'inherit' });
 const total = results.findings.filter((f) => f.kind === 'failure').length;
 console.log(`\n${results.targets.length} targets, ${total} failures → ${path.join(runDir, 'report.html')}`);
 
@@ -268,7 +292,7 @@ async function assessTarget(t) {
         if (kb.note) out.tabOrderNote = kb.note;
         if (overlay) await ensureState(page, t, phase).catch(() => {}); // the walk may have dismissed the overlay
         out.tabOrderShot = await tabOrderShot(page, t, kb.stops);
-        out.areas.push(...kb.stops.filter((s) => s.box).map((s) => ({ kind: 'tabstop', box: s.box, label: String(s.index) })));
+        out.areas.push(...kb.stops.filter((s) => s.box).map((s) => ({ kind: 'tabstop', box: s.box, label: String(s.index), phase: 'keyboard', shot: out.shot.file })));
         ['2.1.1', '2.1.2', '2.4.3', '2.4.7', '2.4.11'].forEach((sc) => coverage.add(sc));
         out.checks.keyboard = { status: 'ok' };
         await page.waitForTimeout(checks.has('abledom') ? 2200 : 0); // AbleDOM reports focus loss after 2s
@@ -391,7 +415,7 @@ function pushFindingAreas(out, list) {
   for (const f of list) {
     for (const n of f.nodes ?? []) {
       if (!n.box) continue;
-      out.areas.push({ kind: 'finding', box: n.box, label: String(out.areas.filter((a) => a.kind === 'finding').length + 1), finding: f, findingKind: f.kind });
+      out.areas.push({ kind: 'finding', box: n.box, label: String(out.areas.filter((a) => a.kind === 'finding').length + 1), finding: f, findingKind: f.kind, phase: 'main', shot: out.shot?.file });
     }
   }
 }
@@ -402,7 +426,8 @@ function pushFindingAreas(out, list) {
 async function captureShotAreas(page, t, out, pageSize, shots) {
   const cutSel = !t.screen.cut || t.screen.cut === 'scope' ? t.screen.scope : t.screen.cut;
   const scopeBox = t.screen.scope ? await page.evaluate(boxInPage, t.screen.scope).catch(() => null) : null;
-  if (scopeBox) out.areas.push({ kind: 'scope', box: scopeBox, label: t.screen.name });
+  if (scopeBox) out.areas.push({ kind: 'scope', box: scopeBox, label: t.screen.name, phase: 'main', shot: out.shot.file });
+  else if (t.screen.scope) out.scopeMissingReason = 'not-locatable';
   await captureSubscreenTriggers(page, t, out);
   const cutBox = cutSel ? await page.evaluate(boxInPage, cutSel).catch(() => null) : null;
   const pad = 16;
@@ -435,7 +460,7 @@ async function captureSubscreenTriggers(page, t, out) {
       const bb = await loc.boundingBox();
       if (!bb || !bb.width || !bb.height) continue;
       const scroll = await page.evaluate(() => ({ x: window.scrollX, y: window.scrollY }));
-      out.areas.push({ kind: 'subscreen', box: { x: bb.x + scroll.x, y: bb.y + scroll.y, width: bb.width, height: bb.height }, label: c.name, childScreen: c.id });
+      out.areas.push({ kind: 'subscreen', box: { x: bb.x + scroll.x, y: bb.y + scroll.y, width: bb.width, height: bb.height }, label: c.name, childScreen: c.id, phase: 'main', shot: out.shot.file });
     } catch {
       // trigger not present/visible in this state - skip
     }
@@ -452,8 +477,16 @@ function boxInPage(selector) {
 
 async function openPage(t, viewport) {
   const { name, width, height, ...vpRest } = viewport;
-  const context = await browser.newContext({ viewport: { width, height }, ...vpRest, ...(storageStateAbs ? { storageState: storageStateAbs } : {}), ...(t.state.emulate ?? {}) });
+  const context = await session.newContext({ viewport: { width, height }, ...vpRest, ...(storageStateAbs ? { storageState: storageStateAbs } : {}), ...(t.state.emulate ?? {}) }, t);
   const page = await context.newPage();
+  await session.beforeTarget({ context, page, target: t });
+  const realClose = context.close.bind(context);
+  let closed = false;
+  context.close = async () => {
+    if (closed) return;
+    closed = true;
+    try { await session.afterTarget({ context, page, target: t, status: 'closed' }); } finally { await realClose(); }
+  };
   const ableLog = [];
   const phase = { name: 'start', step: -1 };
   if (bundle) {
@@ -628,7 +661,9 @@ function modalitiesFor(t) {
 // needs a pointer or a programmatic focus move is performed in a rescue scope so the barrier is
 // demonstrated, then reported as a finding with the step as repro and a screenshot.
 async function runModalityPhase(t, modality, out) {
+  const interventionsBefore = (t.interventions ?? []).length;
   const { context, page: raw } = await openPage(t, t.viewport);
+  const stepsFile = path.join(runDir, STEPS_FILE);
   const ctl = { rescue: false };
   const ctx = { page: guardSurface(raw, ctl), raw, ctl, obs: makeObserver(raw), modality, maxPresses, noEscalate, actionable: false };
   const run = { modality, status: 'complete', steps: [] };
@@ -646,6 +681,8 @@ async function runModalityPhase(t, modality, out) {
       }
       Object.assign(rec, { outcome: r.outcome, presses: r.presses, escalation: r.escalation ?? null, note: r.note ?? null, key: r.key ?? null, rules: r.findings.map((f) => f.rule) });
       run.steps.push(rec);
+      const fp = await probeFocus(raw);
+      appendStep(stepsFile, { target: t.key, modality, step: i, action: st.action, key: r.key ?? null, pageUrl: raw.url(), focused: fp.focused, outcome: fp.outcome === 'ok' ? r.outcome : fp.outcome, ...(r.note ? { note: r.note } : {}) });
       for (const f of r.findings) {
         const meta = MODALITY_RULES[f.rule];
         if (!meta) continue;
@@ -664,6 +701,7 @@ async function runModalityPhase(t, modality, out) {
     }
     if (run.status === 'complete' && run.steps.some((s) => s.outcome === 'escalated')) run.status = 'escalated';
     if (run.status === 'complete' && run.steps.some((s) => s.outcome === 'inconclusive')) run.status = 'partial';
+    if (run.status === 'complete' && (t.interventions ?? []).length > interventionsBefore) { run.status = 'partial'; run.note = 'setup intervention recorded during this run'; }
   } finally {
     await context.close();
   }

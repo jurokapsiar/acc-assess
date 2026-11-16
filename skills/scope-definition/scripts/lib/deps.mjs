@@ -52,3 +52,11 @@ export async function launchChromium({ channel, headed } = {}) {
   const pw = requireFromSibling('playwright');
   return pw.chromium.launch({ headless: !headed, ...(channel ? { channel } : {}) });
 }
+
+/** Browser session honoring `--setup <module>` / `--cdp <endpoint>` (shared implementation in
+ * the sibling skill's lib/browser-setup.mjs). Without either it launches Chromium as usual. */
+export async function openBrowserSession({ channel, headed, setup, cdp } = {}) {
+  const pw = requireFromSibling('playwright');
+  const { createBrowserSession } = await importSiblingLib('browser-setup.mjs');
+  return createBrowserSession({ chromium: pw.chromium, headed, channel, setupPath: setup, cdp });
+}

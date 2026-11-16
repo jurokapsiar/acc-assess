@@ -38,6 +38,7 @@ export const STATUS = {
   fail: { fill: 'url(#p-fail)', label: 'Fail' },
   review: { fill: 'url(#p-review)', label: 'Review' },
   checked: { fill: 'var(--c-pass)', label: 'No issues detected' },
+  unevaluated: { fill: '#c9d3e6', label: 'Not evaluated (partial run)' },
   manual: { fill: 'var(--c-manual)', label: 'Manual check' },
 };
 
@@ -281,7 +282,9 @@ const TOGGLES = [
   { kind: 'tabstop', cls: 't-tabstop', globalLabel: 'Tab stops', checked: false },
   { kind: 'scope', cls: 't-scope', globalLabel: 'Scope boxes', checked: true },
   { kind: 'subscreen', cls: 't-subscreen', globalLabel: 'Subscreens', checked: false },
+  { kind: 'outscope', cls: 't-outscope', globalLabel: 'Potentially out of scope', checked: false },
 ];
+const OPTIONAL_KINDS = new Set(['subscreen', 'outscope']);
 
 // `findings` is the final list (after agent annotations/dismissals): finding areas whose
 // finding is no longer in it (dismissed) are dropped, the drawn kind follows the merged
@@ -306,19 +309,20 @@ export function scopeSection(results, findings, groupSections, opts = {}) {
     for (const g of groups) for (const item of g.items) anchorFor.set(item.id, { anchor: `${id}-${slug(g.key)}`, title: g.title });
   }
   const byId = new Map(findings.map((f) => [f.id, f]));
+  const outById = new Map((opts.outFindings ?? []).map((f) => [f.id, f]));
   const areasByTarget = new Map();
   for (const t of results.targets ?? []) {
     const list = [];
     for (const a of t.areas ?? []) {
       if (a.kind === 'finding' && a.finding != null) {
         const f = byId.get(a.finding);
-        if (!f) continue;
-        list.push({ ...a, findingKind: f.kind });
-      } else if (TOGGLES.some((d) => d.kind === a.kind)) list.push(a);
+        if (f) list.push({ ...a, findingKind: f.kind });
+        else if (outById.has(a.finding)) list.push({ ...a, kind: 'outscope', findingKind: outById.get(a.finding).kind });
+      } else if (TOGGLES.some((d) => d.kind === a.kind) && a.kind !== 'outscope') list.push(a);
     }
-    for (const f of findings) {
+    for (const f of [...findings, ...outById.values()]) {
       if (f.target !== t.key || f.source !== 'agent') continue;
-      for (const n of f.nodes ?? []) if (n.box && (!n.phase || n.phase === 'main')) list.push({ kind: 'finding', box: n.box, label: f.title ?? f.rule, finding: f.id, findingKind: f.kind });
+      for (const n of f.nodes ?? []) if (n.box && (!n.phase || n.phase === 'main')) list.push({ kind: outById.has(f.id) ? 'outscope' : 'finding', box: n.box, label: f.title ?? f.rule, finding: f.id, findingKind: f.kind });
     }
     areasByTarget.set(t.key, list);
   }
@@ -339,7 +343,11 @@ export function scopeSection(results, findings, groupSections, opts = {}) {
         continue;
       }
       for (const t of matches) {
-        list.push({ id: t.key, label: `${t.state.name ?? titleCase(stateId)} · ${t.viewport.name}`, target: t.shot ? t : null, note: t.shot ? null : (t.status === 'error' ? (t.error ?? 'Not reached') : 'Not reached') });
+        const note = t.shot ? null
+          : t.status === 'blocked' ? `Blocked: ${t.reason}`
+            : t.status === 'not-attempted' ? `Not attempted: ${t.reason}`
+              : t.status === 'error' ? (t.error ?? 'Not reached') : 'Not reached';
+        list.push({ id: t.key, label: `${t.state.name ?? titleCase(stateId)} · ${t.viewport.name}`, target: t.shot ? t : null, note });
       }
     }
     return list;
@@ -396,24 +404,26 @@ export function scopeSection(results, findings, groupSections, opts = {}) {
     const outside = areas.filter((a) => !inside(a)).length;
     const counts = countsFor(e) ?? {};
     const layers = () => TOGGLES.map((d) => `<g class="l-${d.kind}">${areas.filter((a) => a.kind === d.kind && inside(a)).map((a) => areaRect(a, cutBox)).join('')}</g>`).join('');
+    const drawnCount = areas.filter((a) => inside(a) && TOGGLES.some((d) => d.kind === a.kind)).length;
     const alt = attr(`${s.name}, ${t.state.name}, ${t.viewport.name}`);
     const dialogId = `dlg-${n}`;
     opts.dialogMap?.set(t.key, dialogId);
     const items = issueItemsFor(t);
     const mobile = (t.viewport.width ?? 0) < 600;
-    const printCounts = TOGGLES.filter((d) => d.kind !== 'subscreen' || (counts[d.kind] ?? 0) > 0)
+    const printCounts = TOGGLES.filter((d) => !OPTIONAL_KINDS.has(d.kind) || (counts[d.kind] ?? 0) > 0)
       .map((d) => `${counts[d.kind] ?? 0} ${d.globalLabel.toLowerCase()}`).join(' · ');
     return `<div class="panel" data-panel="${radioId}">
       <figure class="view${mobile ? ' is-mobile' : ''}">
         <button type="button" class="expand" data-dialog="${dialogId}" aria-haspopup="dialog">
           <img src="${attr(img)}" alt="${alt}" loading="lazy">
-          <svg viewBox="${cutBox.x} ${cutBox.y} ${cutBox.width} ${cutBox.height}" aria-hidden="true">${layers()}</svg>
+          <svg viewBox="${cutBox.x} ${cutBox.y} ${cutBox.width} ${cutBox.height}" data-areas="${drawnCount}" aria-hidden="true">${layers()}</svg>
           <span class="expand-hint" aria-hidden="true">⤢ Full screen</span>
         </button>
         <noscript><p><a href="${attr(t.shot.file)}">Open screenshot</a></p></noscript>
         <figcaption>
           ${outside ? `<p class="view-label"><a class="outside" href="${attr(t.shot.file)}" title="Areas outside the cropped view; open the full screenshot">+${outside} outside</a></p>` : ''}
           ${printCounts ? `<p class="print-only">${esc(printCounts)}</p>` : ''}
+          ${geometryNoteHtml(t)}
           ${issueLinksHtml(items)}
         </figcaption>
       </figure>
@@ -425,10 +435,23 @@ export function scopeSection(results, findings, groupSections, opts = {}) {
         </div>
         <div class="dialog-body${mobile ? ' is-mobile' : ''}" tabindex="0" role="group" aria-label="Scrollable screenshot area">
           <img src="${attr(img)}" alt="${alt}" loading="lazy">
-          <svg viewBox="${cutBox.x} ${cutBox.y} ${cutBox.width} ${cutBox.height}" aria-hidden="true">${layers()}</svg>
+          <svg viewBox="${cutBox.x} ${cutBox.y} ${cutBox.width} ${cutBox.height}" data-areas="${drawnCount}" aria-hidden="true">${layers()}</svg>
         </div>
       </dialog>
     </div>`;
+  }
+
+  function geometryNoteHtml(t) {
+    const g = t.geometry;
+    if (!g) return '';
+    const REASON = { 'other-viewport': 'measured at another viewport', 'other-phase': 'found in another check phase', offscreen: 'outside the screenshot', 'not-locatable': 'element not locatable' };
+    const known = (id) => byId.has(id) || outById.has(id);
+    const byReason = new Map();
+    for (const d of g.findingsWithoutBox ?? []) if (known(d.finding)) byReason.set(d.reason, (byReason.get(d.reason) ?? 0) + 1);
+    const parts = [...byReason].map(([r, n]) => `${n} issue${n === 1 ? '' : 's'} not drawn: ${REASON[r] ?? r}`);
+    if (g.tabstopsWithoutBox) parts.push(`${g.tabstopsWithoutBox} tab stop${g.tabstopsWithoutBox === 1 ? '' : 's'} not drawn: not locatable`);
+    if (String(g.scope).startsWith('missing:')) parts.push(`scope box not drawn: ${g.scope.slice(8)}`);
+    return parts.length ? `<p class="geo-note">${parts.map(esc).join(' · ')}</p>` : '';
   }
 
   function issueLinksHtml(items) {
@@ -466,7 +489,7 @@ export function scopeSection(results, findings, groupSections, opts = {}) {
   // radio is selected (§7). Every assessed entry gets a `--p-*` custom-property rule and a
   // pair of `<span data-v>` counters (shown only for the selected entry).
   function scopeBarHtml() {
-    const rows = TOGGLES.filter((d) => d.kind !== 'subscreen' || (globalCounts[d.kind] ?? 0) > 0);
+    const rows = TOGGLES.filter((d) => !OPTIONAL_KINDS.has(d.kind) || (globalCounts[d.kind] ?? 0) > 0);
     if (!rows.length) return '';
     const entries = allScreens.flatMap((s) => screenEntries(s, byScreen.get(s.id) ?? []));
     for (const e of entries) {
@@ -610,7 +633,7 @@ export function modalitySection(results, findings) {
 // Dialog's own one-row controls (toggles + issue-count disclosure + close), unaffected by the
 // Scope meters master toggles until it is opened (synced then by the shared script).
 function toggleRow(idPrefix, counts) {
-  const rows = TOGGLES.filter((d) => d.kind !== 'subscreen' || (counts[d.kind] ?? 0) > 0);
+  const rows = TOGGLES.filter((d) => !OPTIONAL_KINDS.has(d.kind) || (counts[d.kind] ?? 0) > 0);
   if (!rows.length) return '';
   return `<p class="toggles">${rows.map((d) => {
     const id = `${idPrefix}-${d.kind}`;
@@ -621,7 +644,7 @@ function toggleRow(idPrefix, counts) {
 }
 
 function areaRect(a, cutBox) {
-  const cls = a.kind === 'scope' ? 'a-scope' : a.kind === 'tabstop' ? 'a-tabstop' : a.kind === 'subscreen' ? 'a-subscreen'
+  const cls = a.kind === 'scope' ? 'a-scope' : a.kind === 'tabstop' ? 'a-tabstop' : a.kind === 'subscreen' ? 'a-subscreen' : a.kind === 'outscope' ? 'a-out'
     : a.findingKind === 'failure' ? 'a-fail' : a.findingKind === 'review' ? 'a-review' : 'a-suggest';
   const rect = `<rect class="area ${cls}" x="${a.box.x}" y="${a.box.y}" width="${a.box.width}" height="${a.box.height}"><title>${esc(a.label ?? '')}</title></rect>`;
   if (a.kind !== 'tabstop' || !a.label) return rect;
@@ -948,7 +971,7 @@ export function css() {
 --critical:#f6caca;--serious:#f8dcc3;--moderate:#f6edbd;--minor:#d5e3f3;--review:#f7e3ad;--pass:#d3ead8;--neutral:#ececec;
 --c-fail:#f2b8b2;--c-fail-ink:#a8433b;--c-review:#f3d892;--c-review-ink:#8a6510;--c-pass:#b9dcc2;--c-manual:#e2e2e2;--c-track:#f0f0f0;
 --c-issue-1:#e9968e;--c-issue-2:#f3bdb7;--c-issue-3:#f9dcd8;--c-issue-4:#fcebe9;
---m-finding:#cc5248;--m-tabstop:#7a7a7a;--m-scope:#3f8a56;
+--m-finding:#cc5248;--m-tabstop:#7a7a7a;--m-scope:#3f8a56;--m-outscope:#8a7ab8;
 --fs-xs:.75rem;--fs-s:.85rem;--fs-l:1.15rem;--fs-xl:1.6rem;--fs-num:2rem;
 --s1:4px;--s2:8px;--s3:12px;--s4:16px;--s5:24px;--s6:40px;--r1:4px;--r2:8px;--r3:12px;--nav-h:52px}
 *{box-sizing:border-box}
@@ -1143,6 +1166,12 @@ details>summary{cursor:pointer;color:var(--muted)}
 .a-scope{fill:var(--pass);stroke:#4f9a66;fill-opacity:.18;stroke-dasharray:8 5}
 .a-tabstop{fill:var(--neutral);stroke:#6b6b6b}
 .a-subscreen{fill:var(--subscreen);stroke:#3f7a63}
+.a-out{fill:rgba(138,122,184,.18);stroke:#6b5a9e;stroke-dasharray:5 3}
+.geo-note{margin:var(--s1) 0;font-size:var(--fs-xs);color:var(--muted,#555)}
+.banner{margin:var(--s4) 0;padding:var(--s3) var(--s4);border:1px solid var(--k-review-line);background:var(--k-review);border-radius:var(--r2)}
+.banner h2{margin:0 0 var(--s2);font-size:var(--fs-l)}
+.banner ul{margin:var(--s2) 0 0;padding-left:var(--s5)}
+.banner-out{border-color:#cfc6e6;background:#f4f1fa}
 .tab-num{font-weight:700;fill:var(--ink);paint-order:stroke;stroke:#fff;stroke-width:3px;vector-effect:non-scaling-stroke}
 .view-label{margin:6px 0 0;font-size:.85rem}
 .view-issues{list-style:none;margin:8px 0 0;padding:0;font-size:.82rem;display:flex;flex-direction:column;gap:2px}
@@ -1175,8 +1204,8 @@ details>summary{cursor:pointer;color:var(--muted)}
 .journey-step-label{font-weight:650}
 /* layer visibility: master boxes (Scope meters) drive the inline view; dialog boxes (synced
    on open) drive the dialog, so toggling inside the dialog works even when a master is off. */
-.scope:not(:has(#g-scope:checked)) .view .l-scope,.scope:not(:has(#g-finding:checked)) .view .l-finding,.scope:not(:has(#g-tabstop:checked)) .view .l-tabstop,.scope:not(:has(#g-subscreen:checked)) .view .l-subscreen{display:none}
-.shot-dialog:not(:has(.t-scope:checked)) .l-scope,.shot-dialog:not(:has(.t-finding:checked)) .l-finding,.shot-dialog:not(:has(.t-tabstop:checked)) .l-tabstop,.shot-dialog:not(:has(.t-subscreen:checked)) .l-subscreen{display:none}
+.scope:not(:has(#g-scope:checked)) .view .l-scope,.scope:not(:has(#g-finding:checked)) .view .l-finding,.scope:not(:has(#g-tabstop:checked)) .view .l-tabstop,.scope:not(:has(#g-subscreen:checked)) .view .l-subscreen,.scope:not(:has(#g-outscope:checked)) .view .l-outscope{display:none}
+.shot-dialog:not(:has(.t-scope:checked)) .l-scope,.shot-dialog:not(:has(.t-finding:checked)) .l-finding,.shot-dialog:not(:has(.t-tabstop:checked)) .l-tabstop,.shot-dialog:not(:has(.t-subscreen:checked)) .l-subscreen,.shot-dialog:not(:has(.t-outscope:checked)) .l-outscope{display:none}
 /* ---- responsive ---- */
 @media (max-width:900px){.sum-tiles{grid-template-columns:1fr;gap:var(--s5)}.sum-tiles.two{grid-template-columns:1fr}.tile{padding:0;border-left:0}.tile+.tile{border-top:1px solid var(--line-soft);padding-top:var(--s5)}.crit>.legend,.crit>.breakdown{flex-basis:100%}}
 @media (max-width:720px){

@@ -222,6 +222,15 @@ For each target:
 
 Transient UI such as menus can close when a screenshot or scroll happens, so the runner replays the plan if the screen disappears.
 
+Hardening gates (details in [`SKILL.md`](skills/accessibility-assessment/SKILL.md) and [`results-schema.md`](skills/accessibility-assessment/references/results-schema.md)):
+
+- `results.json` is validated on write and on every read; invalid input fails closed.
+- Targets that were not reached (`error`/`blocked`/`not-attempted`) make the run **partial**: a banner appears and unchecked criteria read "Not evaluated".
+- `report.mjs` checks the rendered page in Chromium before replacing `report.html` (`--no-check` skips it).
+- Findings outside the requested scope are marked potentially out of scope (engine signal + agent `scope`), listed separately and kept out of counts, fixes and verification.
+- `--setup <module>` / `--cdp <loopback endpoint>` let an app-specific skill supply its own browser wiring; non-fresh isolation and interventions are disclosed and cap verification.
+- Modality runs and `scope.mjs explore` append `steps.jsonl` incrementally.
+
 Coverage per criterion, including what is left to the agent or a human: [`references/criteria-coverage.md`](skills/accessibility-assessment/references/criteria-coverage.md).
 
 ## What failed: examples from the sample app
@@ -404,7 +413,8 @@ scope-definition  --scope-->  assess.mjs --scope  --results.json-->  report.mjs/
 cd <your-app>
 node <scope-definition-skill>/scripts/scope.mjs init --prompt "…" --url http://localhost:3000
 node <scope-definition-skill>/scripts/scope.mjs preflight
-node <scope-definition-skill>/scripts/scope.mjs intent
+node <scope-definition-skill>/scripts/scope.mjs intent --template   # the agent fills it in from the prompt…
+node <scope-definition-skill>/scripts/scope.mjs intent --from intent.json   # …and the script validates it
 node <scope-definition-skill>/scripts/scope.mjs ground
 # … explore + step (agent-driven), then:
 node <scope-definition-skill>/scripts/scope.mjs propose

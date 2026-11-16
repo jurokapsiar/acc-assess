@@ -5,7 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { serveDir } from './helpers.mjs';
-import { SIBLING_FIXTURES_DIR, freshDir, loadTemplateInventory, withInventory, writeInventory, runScope, sessionJsonPath, scopeJsonPath, readJson } from './helpers.mjs';
+import { runIntent, SIBLING_FIXTURES_DIR, freshDir, loadTemplateInventory, withInventory, writeInventory, runScope, sessionJsonPath, scopeJsonPath, readJson } from './helpers.mjs';
 
 let server;
 
@@ -35,6 +35,25 @@ async function run(appRoot, command, flags) {
   return r;
 }
 
+async function intent(appRoot, id, prompt, overrides) {
+  const session = readJson(sessionJsonPath(appRoot, id));
+  const r = await runIntent(appRoot, id, prompt ?? session.prompt, overrides);
+  if (r.code !== 0) throw new Error(`intent exited ${r.code}:\n${r.stdout}\n${r.stderr}`);
+  return r;
+}
+
+// ------------------------------------------------------------------ intent is agent-authored
+
+test('intent: without --from it exits 3 (the agent must interpret the prompt); --template prints a skeleton', async () => {
+  const appRoot = setupApp('cli-intent-required');
+  await run(appRoot, 'init', ['--prompt', 'check the no screen readers case', '--inventory', '.a11y/inventory.json', '--id', 's1']);
+  await run(appRoot, 'preflight', ['--session', 's1']);
+  const r = await runScope('intent', ['--session', 's1'], { appRoot });
+  assert.equal(r.code, 3);
+  const t = await run(appRoot, 'intent', ['--session', 's1', '--template']);
+  assert.equal(JSON.parse(t.stdout).prompt, 'check the no screen readers case');
+});
+
 // ------------------------------------------------------------------ item 9: full pipeline, a dialog screen + a new state, two viewports
 
 test('full pipeline: init -> preflight -> intent -> ground -> step (reuse a screen, add a new state) -> propose -> confirm -> verify, 2 viewports', async () => {
@@ -43,7 +62,7 @@ test('full pipeline: init -> preflight -> intent -> ground -> step (reuse a scre
   assert.match(init.stdout, /Created session "demo-session"/);
 
   await run(appRoot, 'preflight', ['--session', 'demo-session']);
-  await run(appRoot, 'intent', ['--session', 'demo-session']);
+  await intent(appRoot, 'demo-session', 'open the example dialog, close it, and check the dialog-open state, on mobile and desktop', { viewports: ['mobile', 'desktop'] });
   await run(appRoot, 'ground', ['--session', 'demo-session', '--no-source']);
 
   // Journey 1: revisit the existing "host" screen, then the existing "host-dialog" overlay
@@ -111,7 +130,7 @@ test('verify: a step target that matches more than one element on the page is re
   const appRoot = setupApp('cli-ambiguous');
   await run(appRoot, 'init', ['--prompt', 'play one of the tracks', '--inventory', '.a11y/inventory.json', '--id', 's1']);
   await run(appRoot, 'preflight', ['--session', 's1']);
-  await run(appRoot, 'intent', ['--session', 's1']);
+  await intent(appRoot, 's1');
   await run(appRoot, 'ground', ['--session', 's1', '--no-source']);
   await run(appRoot, 'step', ['--session', 's1', '--journey', 'play-track', '--feature', 'demo', '--checkpoint', 'screen', '--id', 'repeated']);
   // The action belongs on a new STATE attached to the existing "repeated" screen (a bare
@@ -144,7 +163,7 @@ test('verify: a step whose target never appears is reported "unreachable", overa
   const appRoot = setupApp('cli-unreachable');
   await run(appRoot, 'init', ['--prompt', 'click a button that does not exist', '--inventory', '.a11y/inventory.json', '--id', 's1']);
   await run(appRoot, 'preflight', ['--session', 's1']);
-  await run(appRoot, 'intent', ['--session', 's1']);
+  await intent(appRoot, 's1');
   await run(appRoot, 'ground', ['--session', 's1', '--no-source']);
   await run(appRoot, 'step', ['--session', 's1', '--journey', 'phantom', '--feature', 'demo', '--checkpoint', 'screen', '--id', 'host']);
   await run(appRoot, 'step', ['--session', 's1', '--journey', 'phantom', '--checkpoint', 'state', '--screen', 'host', '--id', 'phantom-click', '--name', 'Phantom click']);
@@ -173,7 +192,7 @@ test('explore --url: refuses a goto that navigates outside the app origin, and w
   const appRoot = setupApp('cli-safety-origin');
   await run(appRoot, 'init', ['--prompt', 'look around', '--inventory', '.a11y/inventory.json', '--id', 's1']);
   await run(appRoot, 'preflight', ['--session', 's1']);
-  await run(appRoot, 'intent', ['--session', 's1']);
+  await intent(appRoot, 's1');
   await run(appRoot, 'ground', ['--session', 's1', '--no-source']);
 
   const before = fs.existsSync(path.join(appRoot, '.a11y', 'scopes', 's1', 'work', 'snapshots')) ? fs.readdirSync(path.join(appRoot, '.a11y', 'scopes', 's1', 'work', 'snapshots')) : [];
@@ -188,7 +207,7 @@ test('explore --url --steps: refuses a step whose target matches a forbidden des
   const appRoot = setupApp('cli-safety-forbidden');
   await run(appRoot, 'init', ['--prompt', 'look around, but do not delete anything', '--inventory', '.a11y/inventory.json', '--id', 's1']);
   await run(appRoot, 'preflight', ['--session', 's1']);
-  await run(appRoot, 'intent', ['--session', 's1']);
+  await intent(appRoot, 's1');
   await run(appRoot, 'ground', ['--session', 's1', '--no-source']);
 
   const stepsFile = path.join(appRoot, 'forbidden-steps.json');
