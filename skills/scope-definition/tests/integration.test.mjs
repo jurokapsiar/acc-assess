@@ -122,6 +122,14 @@ test('full pipeline: init -> preflight -> intent -> ground -> step (reuse a scre
   }
   // No stale target-based "unresolved" entries should remain after a fully successful verify.
   assert.deepEqual((scope.unresolved ?? []).filter((u) => u.target), []);
+
+  // replay is noninteractive by default: it exits by itself and leaves screenshot + ARIA evidence.
+  const key = Object.keys(scope.verification.results)[0];
+  const replay = await runScope('replay', ['--scope', scopeFile, '--target', key], { appRoot });
+  assert.equal(replay.code, 0, replay.stdout + replay.stderr);
+  assert.match(replay.stdout, /screenshot: .+\.png/);
+  const aria = replay.stdout.match(/aria snapshot: (.+\.aria\.yml)/)[1].trim();
+  assert.ok(fs.statSync(aria).size > 0);
 });
 
 // ------------------------------------------------------------------ item 10: ambiguity

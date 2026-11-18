@@ -28,23 +28,23 @@ Screenshots below come from a run against a sample React app. The skill itself i
 
 ```mermaid
 flowchart LR
-    A[Source survey<br/>Worker agents] --> C
-    B[Runtime survey<br/>ARIA snapshots] --> C
-    C[(inventory.json<br/>features → screens → states)] --> D[verify]
-    S[free-text request] --> T[scope-definition skill<br/>scope.json + journeys.json]
-    T -.optional, replaces<br/>feature/screen picks.-> E
-    D --> E[assess<br/>selected features / screens, or --scope]
-    E --> F[results.json + screenshots + source]
-    G[(knowledge/<br/>WCAG + APG, scraped)] --> H
-    F --> H[Agent review<br/>APG, manual criteria, source fixes]
-    H --> I[report.html]
-    I --> J[fixes.mjs<br/>fix-*.md]
-    J --> K[Fix applied] --> L[verify.mjs]
-    L --> M{fixed?}
-    M -->|needs review / unverified| N[fix-verify skill]
+    A["Source survey"] --> C
+    B["Runtime survey<br/>ARIA snapshots"] --> C
+    C[("inventory.json<br/>features → screens → states")] --> D["verify"]
+    S["free-text request"] --> T["scope-definition skill<br/>scope.json + journeys.json"]
+    T -."optional, replaces<br/>feature/screen picks".-> E
+    D --> E["assess<br/>selected features / screens, or --scope"]
+    E --> F["results.json + screenshots + source"]
+    G[("knowledge/<br/>WCAG + APG, scraped")] --> H
+    F --> H["Agent review<br/>APG, manual criteria, source fixes"]
+    H --> I["report.html"]
+    I --> J["fixes.mjs<br/>fix-*.md"]
+    J --> K["Fix applied"] --> L["verify.mjs"]
+    L --> M{"fixed?"}
+    M -->|"needs review / unverified"| N["fix-verify skill"]
     N --> L
-    M -->|not fixed / regressed| J
-    M -->|fixed| I
+    M -->|"not fixed / regressed"| J
+    M -->|"fixed"| I
 ```
 
 | Layer | Tool | Role |
@@ -64,12 +64,27 @@ Findings fall into four kinds. Optional requirements are **never** failures.
 | `suggestion` | AAA, best practice, or APG guidance with no criterion attached |
 | `dismissed` | A false positive triaged by the agent (hidden from the report) |
 
-## Quick start
+## Installation
+
+Requirements: Node.js 20+ and a network path to your npm registry (dependencies install with your
+existing npm configuration; this repo does not set a registry). The skills are plain folders, so
+install by copying or symlinking `skills/*` into your agent runtime's skills location, then set up
+the assessment skill's dependencies once (the other skills reuse them):
 
 ```bash
 cd skills/accessibility-assessment
-npm run setup        # dependencies + Playwright Chromium
-npm run knowledge    # scrape WCAG 2.2 + APG into knowledge/ (git-ignored)
+npm run setup        # npm install + Playwright Chromium (or use --channel msedge|chrome later)
+npm run knowledge    # WCAG 2.2 + APG into knowledge/ (git-ignored)
+```
+
+`npm run setup` and `npm run knowledge` can take several minutes; give them a long timeout or run
+them in the background. Verify with `npm test` in `skills/accessibility-assessment` and
+`skills/scope-definition`.
+
+## Quick start
+
+```bash
+cd skills/accessibility-assessment   # after the Installation steps above
 npm test             # optional: the skill's own tests (local fixtures, no app needed)
 
 cd <your-app>        # app must be running
@@ -115,16 +130,16 @@ Dialogs, menus and popovers are screens. A screen's state can depend on a featur
 
 ```mermaid
 flowchart TD
-    S[Source survey] --> D[Draft inventory]
-    R[Runtime survey] --> D
-    D --> V[inventory validate]
-    V --> W[inventory verify]
-    W -->|unreachable or wrong scope| F[Fix locators with inventory snapshot]
+    S["Source survey"] --> D["Draft inventory"]
+    R["Runtime survey"] --> D
+    D --> V["inventory validate"]
+    V --> W["inventory verify"]
+    W -->|"unreachable or wrong scope"| F["Fix locators with inventory snapshot"]
     F --> W
-    W -->|all reachable| OK[Inventory ready]
+    W -->|"all reachable"| OK["Inventory ready"]
 ```
 
-Two Worker subagents run in parallel, then their results are merged:
+Two surveys, run one after the other by default (or in parallel if your runtime supports workers; each only reports, and the coordinator writes `inventory.json`):
 
 | Survey | What it reads | What it records |
 |---|---|---|
@@ -411,14 +426,14 @@ scope-definition  --scope-->  assess.mjs --scope  --results.json-->  report.mjs/
 
 ```bash
 cd <your-app>
-node <scope-definition-skill>/scripts/scope.mjs init --prompt "…" --url http://localhost:3000
-node <scope-definition-skill>/scripts/scope.mjs preflight
-node <scope-definition-skill>/scripts/scope.mjs intent --template   # the agent fills it in from the prompt…
-node <scope-definition-skill>/scripts/scope.mjs intent --from intent.json   # …and the script validates it
-node <scope-definition-skill>/scripts/scope.mjs ground
+node <scope-definition-skill>/scripts/scope.mjs init --prompt "…" --url http://localhost:3000 --id my-scope
+node <scope-definition-skill>/scripts/scope.mjs preflight --session my-scope
+node <scope-definition-skill>/scripts/scope.mjs intent --session my-scope --template   # the agent fills it in from the prompt…
+node <scope-definition-skill>/scripts/scope.mjs intent --session my-scope --from intent.json   # …and the script validates it
+node <scope-definition-skill>/scripts/scope.mjs ground --session my-scope
 # … explore + step (agent-driven), then:
-node <scope-definition-skill>/scripts/scope.mjs propose
-node <scope-definition-skill>/scripts/scope.mjs confirm --approved-by <name>    # human confirm gate
+node <scope-definition-skill>/scripts/scope.mjs propose --session my-scope
+node <scope-definition-skill>/scripts/scope.mjs confirm --session my-scope --approved-by <name>    # human confirm gate
 node <scope-definition-skill>/scripts/scope.mjs verify --scope .a11y/scopes/<id>/scope.json
 
 node <skill>/scripts/assess.mjs --scope .a11y/scopes/<id>/scope.json

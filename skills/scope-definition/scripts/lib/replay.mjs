@@ -124,25 +124,38 @@ export async function verifyTargets({ appRoot, inv, scope, targets, viewportFilt
   return { results, status, execution };
 }
 
-/** Read-only manual replay (§10): runs the compiled plan for one target, then pauses (headed)
- * so the agent/user can inspect. No writes. */
-export async function replayTarget({ appRoot, inv, scope, targetKey, headed = true, channel, setup, cdp }) {
+/** Read-only manual replay (§10): runs the compiled plan for one target and, by default,
+ * captures a screenshot + ARIA snapshot into `evidenceDir` (noninteractive; never blocks).
+ * With `pause` (headed only) it also opens the Playwright inspector for manual inspection.
+ * Returns the evidence file paths. Never modifies scope/inventory. */
+export async function replayTarget({ appRoot, inv, scope, targetKey, headed = false, pause = false, evidenceDir, channel, setup, cdp }) {
   const { resolveTargets } = await loadInventoryLib();
   const { runPlan } = await loadStepsLib();
   const { applyScope } = await loadScopeLib();
   const { inv: overlaid, conflicts } = applyScope(inv, scope);
   if (conflicts.length) throw new Error(`Scope conflicts with inventory: ${conflicts.join('; ')}`);
   const [target] = resolveTargets(overlaid, { targets: [targetKey] });
+  if (pause && !headed) throw new Error('--pause needs a visible browser');
   const session = await openBrowserSession({ channel, headed, setup, cdp });
+  const evidence = {};
   try {
     const context = await session.newContext({ viewport: { width: target.viewport.width, height: target.viewport.height } }, target);
     const page = await context.newPage();
     await session.beforeTarget({ context, page, target });
     await runPlan(page, target.plan);
-    if (headed) await page.pause();
+    if (evidenceDir) {
+      fs.mkdirSync(evidenceDir, { recursive: true });
+      const base = path.join(evidenceDir, target.key.replace(/[^\w.-]+/g, '_'));
+      evidence.screenshot = `${base}.png`;
+      evidence.ariaSnapshot = `${base}.aria.yml`;
+      await page.screenshot({ path: evidence.screenshot });
+      fs.writeFileSync(evidence.ariaSnapshot, `${await page.locator('body').ariaSnapshot()}\n`);
+    }
+    if (pause) await page.pause();
     await session.afterTarget({ context, page, target, status: 'replayed' });
     await context.close();
   } finally {
     await session.close();
   }
+  return evidence;
 }

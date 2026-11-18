@@ -108,7 +108,7 @@ in order (`init → preflighted → intent → grounded → explored → propose
 | `propose` | Compile the draft into `scope.json` + `journeys.json` + `proposal.md` | the three committable files |
 | `confirm --approved-by <name> [--yes]` | **The human confirm gate.** Records who approved and when | `scope.json.approval` |
 | `verify --scope <f> [--viewport all\|v1,v2] [--headed] [--channel]` | Headless replay of every target; the acceptance test | `scope.json.verification`, `work/verify/` |
-| `replay --scope <f> --target <key> [--headed]` | Manual, read-only replay of one target for inspection | none |
+| `replay --scope <f> --target <key> [--pause] [--headed] [--out <dir>]` | Read-only replay of one target; headless by default, never blocks. Saves a screenshot + ARIA snapshot; `--pause` (implies headed) opens the Playwright inspector and waits | `work/replay/<key>.png`, `.aria.yml` (or `--out`) |
 | `merge --scope <f> [--inventory f] [--dry-run]` | Optional: fold a verified scope into the inventory | `inventory.json` |
 | `login --save <file> --url <loginUrl> [--channel]` | Headed, manual login; saves a Playwright storage state | the storage-state file |
 | `status --session <s> \| --scope <f>` | Print phase/targets/verification | none |
@@ -176,8 +176,9 @@ See [references/schema.md](references/schema.md) for the full field reference of
 - `fix-verify`'s `verify.mjs` forwards a baseline's `results.scope` automatically when re-running
   a fix check; a missing scope file is `unverified (scope file not found)`, never a silent
   fallback to the bare inventory.
-- `scope.mjs replay --scope <f> --target <key> --headed` opens a browser at one target and pauses
-  for manual inspection (`needs review` items) - read-only, no writes.
+- `scope.mjs replay --scope <f> --target <key>` replays one target headless and saves a screenshot
+  and ARIA snapshot (printed paths) for `needs review` items - read-only for scope/inventory, and
+  it exits on its own. Add `--pause` (opens a headed inspector and waits) only for an interactive human session.
 
 ## Merge (optional)
 

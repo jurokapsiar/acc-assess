@@ -60,9 +60,10 @@ draft the same as a reviewed fix.
    scope file is forwarded to the re-run automatically — nothing to pass here. If that scope
    file is missing, the attempt is `unverified (scope file not found)` rather than silently
    falling back to the bare inventory; restore the file or re-baseline. For a `needs review`
-   manual replay (step 3), prefer `scope.mjs replay --scope <f> --target <key> --headed` (read-only,
-   opens the browser at the target state) over ad-hoc re-navigation when the target came from a
-   scope.
+   manual replay (step 3), prefer `scope.mjs replay --scope <f> --target <key>` (read-only; headless,
+      exits by itself and prints a screenshot + ARIA snapshot path to inspect) over ad-hoc
+      re-navigation when the target came from a scope. Add `--pause` only when a human is
+      driving; never in unattended runs, as it waits for the inspector.
 3. **For any `needs review` result** (a `review`-kind issue, or one from agent judgement, not an
    engine rule — these can never auto-resolve to `fixed`): replay the fix file's **Reproduce**
    steps with Playwright, compare the before screenshot against the live page now, and decide.

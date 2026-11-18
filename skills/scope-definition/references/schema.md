@@ -53,7 +53,7 @@ The script only validates the schema (`validateIntent`).
   "status": "proposed | confirmed | verified | partial",
   "intent": "Invite dialog and its validation error, dark theme, mobile; no submits",
   "producers": ["text"],                       // union of journeys[].producer
-  "inventory": ".a11y/inventory.json",         // relative to the app root
+  "inventory": "../../inventory.json",         // relative to the directory containing scope.json
   "inventorySha256": "<hash at propose time>",
   "journeys": "journeys.json",                 // relative to this file's directory
   "journeysSha256": "<hash>",

@@ -25,6 +25,7 @@ Assess a running web application against WCAG 2.2 and the WAI-ARIA Authoring Pra
   `knowledge/` is generated and git-ignored. Re-run `npm run knowledge` to refresh it.
 - The target app must be running and reachable. If it isn't, start it and record the command in `app.start` in the inventory.
 - If Chromium can't be installed, pass `--channel msedge` or `--channel chrome`.
+- Long-running commands (`npm run setup`, `npm run knowledge`, `assess.mjs`, `verify.mjs`, `scope.mjs verify`) can take minutes. Give them a generous timeout (10+ minutes) or run them in the background and poll their output; don't kill them early or re-run them concurrently into the same run folder.
 
 All commands below run **from the target app root**:
 
@@ -77,9 +78,9 @@ feature ─┬─ states        (feature-wide: theme.dark, locale.ar, auth.admin
 
 ### 1.1 Discover
 
-Delegate discovery to **Worker subagents** (`explore` or `general-purpose` with a lower effort model like Terra/Luna/Sonnet). Run them in parallel, one per area:
+Do discovery yourself, one survey after the other (single agent is the default). If your runtime supports parallel workers, you may run the two surveys concurrently with any capable model, but follow the single-writer rule below.
 
-| Subagent | Collects |
+| Survey | Collects |
 |---|---|
 | Source survey | Routes, navigation, top-level features, dialogs/menus/popovers and their triggers, global states (theme, locale, mode, auth), existing test ids, start command and port |
 | Runtime survey | `inventory snapshot --url <baseUrl>`, plus snapshots after opening each trigger, to confirm accessible names, roles and reachable overlays |
@@ -178,7 +179,7 @@ Coverage per criterion: [references/criteria-coverage.md](references/criteria-co
 
 ## Step 3: Agent review
 
-Automated engines cover only part of WCAG. For each assessed screen, do the following. For more than a few screens, delegate to Worker subagents in parallel, one screen per subagent, giving each the paths below.
+Automated engines cover only part of WCAG. For each assessed screen, do the following. Review screens one at a time by default. Optionally, if your runtime supports parallel workers, split the screens across them, giving each worker the paths below; workers only **report** findings and the coordinator is the **single writer** of `annotations.json` and `agent-findings.json` (concurrent writers overwrite each other). Never let two workers write the same artifact.
 
 1. **Read the evidence.** Start with `node <skill-dir>/scripts/summary.mjs <run> [--rule id] [--screen id] [--json]` (counts by kind/rule/screen/target, failed criteria, top issues with an example source file, fix files); only open `results.json` for the details of specific findings or targets. Look at `shots/<target>.png` (full screen), `shots/<target>__cut.png` (the screen's crop) and, when the target's `tabOrderShot` isn't `null`, `shots/<target>__taborder.png` (numbered focus order). `results.json` is large; don't read it whole.
 2. **Check APG conformance.** For every slug in the screen's `patterns`, read `<skill-dir>/knowledge/apg/<slug>.md`. Replay the target's `repro` steps with Playwright (or the Playwright MCP), press the listed keys and compare the roles, states and properties.
@@ -302,7 +303,7 @@ When reporting back to the user, summarise briefly: failed criteria with counts,
 | Shell + Node.js | Running the scripts |
 | File read/write | Inventory, annotations, source lookup |
 | Image viewing | Reviewing screenshots |
-| Subagents (Worker - Terra/Luna/Sonnet) | Discovery, per-screen review, source lookup |
+| Subagents / parallel workers (optional, any model) | Faster discovery, per-screen review, source lookup |
 | Playwright (scripts or MCP) | Ad-hoc interaction during agent review |
 
 ## Best practices

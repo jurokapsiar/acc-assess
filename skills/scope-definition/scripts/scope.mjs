@@ -20,7 +20,7 @@
 //   node scripts/scope.mjs propose   --session <s>
 //   node scripts/scope.mjs confirm   --session <s> --approved-by <name> [--yes]
 //   node scripts/scope.mjs verify    --scope <f> [--viewport all|v1,v2] [--headed] [--channel]
-//   node scripts/scope.mjs replay    --scope <f> --target <key> [--headed] [--channel]
+//   node scripts/scope.mjs replay    --scope <f> --target <key> [--pause] [--headed] [--out <dir>] [--channel]
 //   node scripts/scope.mjs merge     --scope <f> [--inventory f] [--dry-run]
 //   node scripts/scope.mjs login     --save <file> --url <loginUrl> [--channel]
 //   node scripts/scope.mjs status    --session <s> | --scope <f>
@@ -525,7 +525,12 @@ async function cmdReplay() {
   scope.__file = scopeFile;
   const { loadInventory } = await loadInventoryLib();
   const inv = loadInventory(path.resolve(path.dirname(scopeFile), scope.inventory));
-  await replayTarget({ appRoot, inv, scope, targetKey: args.target, headed: args.headed !== 'false', channel: args.channel, setup: args.setup, cdp: args.cdp });
+  const pause = args.pause === true;
+  const headed = pause || (args.headed !== undefined && args.headed !== 'false');
+  const evidenceDir = args.out ? path.resolve(String(args.out)) : path.join(workDir(appRoot, scope.id), 'replay');
+  const evidence = await replayTarget({ appRoot, inv, scope, targetKey: args.target, headed, pause, evidenceDir, channel: args.channel, setup: args.setup, cdp: args.cdp });
+  console.log(`replayed ${args.target}`);
+  if (evidence.screenshot) console.log(`screenshot: ${evidence.screenshot}\naria snapshot: ${evidence.ariaSnapshot}`);
 }
 
 async function cmdMerge() {
