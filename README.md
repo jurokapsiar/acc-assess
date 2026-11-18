@@ -1,5 +1,12 @@
 # acc-assess
 
+**NOTE:** This project is in research phase and is currently lacking:
+- evals
+- validation with various models
+- standardized installation
+
+**WARNING:** Agentic review doews not replace user testing.
+
 An agent skill that assesses a web UI against **WCAG 2.2** success criteria and **WAI-ARIA APG** patterns. It produces an axe-style HTML report with screenshots, failed criteria, repro steps and fix suggestions.
 
 - **Skill:** [`skills/accessibility-assessment/SKILL.md`](skills/accessibility-assessment/SKILL.md), plus the companion [`skills/fix-verify/SKILL.md`](skills/fix-verify/SKILL.md), [`skills/scope-definition/SKILL.md`](skills/scope-definition/SKILL.md) and [`skills/screen-reader-validation/SKILL.md`](skills/screen-reader-validation/SKILL.md)
