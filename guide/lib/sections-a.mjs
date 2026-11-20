@@ -66,7 +66,7 @@ export function hero(sum, img) {
   return `<section class="hero" aria-labelledby="top-h"><div class="wrap">
 <div>
 <p class="eyebrow"><a href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> + <a href="https://www.w3.org/WAI/ARIA/apg/">WAI-ARIA APG</a></p>
-<h1 id="top-h">Accessibility-assess skills</h1>
+<h1 id="top-h">acc-assess</h1>
 <p class="lede">A set of skills that validate accessibility based on user journeys, using deterministic tools and agents. <a href="https://github.com/dequelabs/axe-core">axe-core</a> static analysis, <a href="https://github.com/microsoft/abledom">AbleDOM</a> real-time analysis and <a href="https://www.w3.org/WAI/ARIA/apg/">WAI-ARIA APG</a> pattern review against <a href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> combine into a comprehensive analysis.</p>
 <p class="note">It still does not replace manual testing. It aims to make manual testing more accurate. <strong>Research phase:</strong> no evals yet, and validated with few models so far.</p>
 </div>

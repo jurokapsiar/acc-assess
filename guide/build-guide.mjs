@@ -46,7 +46,7 @@ const html = `<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Accessibility-assess skills · Guide</title>
+<title>acc-assess · Guide</title>
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/icon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
@@ -57,7 +57,7 @@ const html = `<!doctype html>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top"><div class="wrap">
-<a class="brand" href="#top-h"><svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><rect x="0" y="0" width="26" height="26" rx="8" fill="#0f6cbd"/><circle cx="13" cy="8" r="2.2" fill="#fff"/><path d="M7 11.5h12M13 11.5v4.5l-3 5M13 16l3 5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg><span>accessibility<span class="long">-assess skills</span></span></a>
+<a class="brand" href="#top-h"><img src="assets/icon.svg" width="26" height="26" alt=""><span>acc-assess</span></a>
 <nav aria-label="Sections"><ul>${NAV.map(([id, t]) => `<li><a href="#${id}">${t}</a></li>`).join('')}</ul></nav>
 </div></header>
 <main id="main" tabindex="-1">
