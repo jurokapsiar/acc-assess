@@ -3,7 +3,6 @@
 **NOTE:** This project is in research phase and is currently lacking:
 - evals
 - validation with various models
-- standardized installation
 
 **WARNING:** Agentic review doews not replace user testing.
 
@@ -11,6 +10,7 @@ An agent skill that assesses a web UI against **WCAG 2.2** success criteria and 
 
 - **Skill:** [`skills/accessibility-assessment/SKILL.md`](skills/accessibility-assessment/SKILL.md), plus the companion [`skills/fix-verify/SKILL.md`](skills/fix-verify/SKILL.md), [`skills/scope-definition/SKILL.md`](skills/scope-definition/SKILL.md) and [`skills/screen-reader-validation/SKILL.md`](skills/screen-reader-validation/SKILL.md)
 - **Rule catalog:** [`rules.md`](rules.md)
+- **Open work:** [`TODO.md`](TODO.md)
 - **Proposed tooling for criteria we can't check automatically yet:** [`new-tools.md`](new-tools.md)
 
 Screenshots below come from a run against a sample React app. The skill itself is app-agnostic.
@@ -18,18 +18,21 @@ Screenshots below come from a run against a sample React app. The skill itself i
 ## Contents
 
 1. [How it works](#how-it-works)
-2. [Quick start](#quick-start)
-3. [Feature and screen discovery](#feature-and-screen-discovery)
-4. [Assessment](#assessment)
-5. [What failed: examples from the sample app](#what-failed-examples-from-the-sample-app)
-6. [The report](#the-report)
-7. [Agent review](#agent-review)
-8. [Source tracking](#source-tracking)
-9. [Fix files](#fix-files)
-10. [Fix-verify](#fix-verify)
-11. [Scoped runs](#scoped-runs)
-12. [Screen reader validation](#screen-reader-validation)
-13. [Repository layout](#repository-layout)
+2. [Installation](#installation)
+3. [Quick Start](#quick-start)
+4. [Usage Examples](#usage-examples)
+5. [Command-line walkthrough](#command-line-walkthrough)
+6. [Feature and screen discovery](#feature-and-screen-discovery)
+7. [Assessment](#assessment)
+8. [What failed: examples from the sample app](#what-failed-examples-from-the-sample-app)
+9. [The report](#the-report)
+10. [Agent review](#agent-review)
+11. [Source tracking](#source-tracking)
+12. [Fix files](#fix-files)
+13. [Fix-verify](#fix-verify)
+14. [Scoped runs](#scoped-runs)
+15. [Screen reader validation](#screen-reader-validation)
+16. [Repository layout](#repository-layout)
 
 ## How it works
 
@@ -73,27 +76,174 @@ Findings fall into four kinds. Optional requirements are **never** failures.
 
 ## Installation
 
-Requirements: Node.js 20+ and a network path to your npm registry (dependencies install with your
-existing npm configuration; this repo does not set a registry). The skills are plain folders, so
-install by copying or symlinking `skills/*` into your agent runtime's skills location, then set up
-the assessment skill's dependencies once (the other skills reuse them):
+This repository holds four standard [Agent Skills](https://agentskills.io) and a
+[Claude Code plugin](https://code.claude.com/docs/en/plugins) wrapper around them. The plugin
+wrapper is `.claude-plugin/` plus a setup hook in `hooks/`.
+
+- `accessibility-assessment` is the core skill. It owns the npm dependencies and the WCAG/APG
+  knowledge cache.
+- `fix-verify`, `scope-definition` and `screen-reader-validation` are companions. They load
+  Playwright and shared code from `../accessibility-assessment`, so **install all four skills
+  together, as sibling folders**.
+
+Requirements: Node.js 20+, npm, and network access on first setup. Setup fetches npm packages
+(through your existing npm configuration; this repo does not set a registry), Playwright Chromium,
+and the WCAG 2.2 + APG pages from w3.org. First setup can take several minutes.
+
+Setup is one idempotent command, `npm run setup` (that is, `node scripts/ensure-setup.mjs`), run in
+the `accessibility-assessment` folder. It installs only what is missing:
+
+- npm dependencies;
+- Playwright Chromium;
+- the `knowledge/` cache.
+
+If another setup run is in progress, it waits for that run instead of installing twice. The skills
+also run it as their step 0, so a missed setup is fixed on first use. `npm run setup:check`
+reports what is missing without installing anything.
+
+### Option 1: Install with `skills` (Recommended)
+
+Vercel's [`skills`](https://github.com/vercel-labs/skills) CLI installs skills into the native
+locations of supported agents.
+
+Install globally for your user:
 
 ```bash
-cd skills/accessibility-assessment
-npm run setup        # npm install + Playwright Chromium (or use --channel msedge|chrome later)
-npm run knowledge    # WCAG 2.2 + APG into knowledge/ (git-ignored)
+npx skills add jurokapsiar/acc-assess --skill '*' --global --yes
 ```
 
-`npm run setup` and `npm run knowledge` can take several minutes; give them a long timeout or run
-them in the background. Verify with `npm test` in `skills/accessibility-assessment` and
-`skills/scope-definition`.
-
-## Quick start
+Install only for the current project by omitting `--global`:
 
 ```bash
-cd skills/accessibility-assessment   # after the Installation steps above
-npm test             # optional: the skill's own tests (local fixtures, no app needed)
+npx skills add jurokapsiar/acc-assess --skill '*' --yes
+```
 
+To target specific agents, add `--agent` followed by one or more agent IDs:
+
+```bash
+npx skills add jurokapsiar/acc-assess --skill '*' --agent claude-code cursor --global --yes
+```
+
+`--skill '*'` installs all four skills. To install a subset, name them, for example
+`--skill accessibility-assessment scope-definition`. Always include `accessibility-assessment`.
+
+After installation, run setup from the installed `accessibility-assessment` directory. The CLI
+prints the location. Examples: `~/.agents/skills/accessibility-assessment` (global, shared),
+`~/.claude/skills/accessibility-assessment` (global, Claude Code only), or
+`.claude/skills/accessibility-assessment` (project, Claude Code only).
+
+```bash
+cd ~/.agents/skills/accessibility-assessment   # or the path the CLI printed
+npm run setup
+```
+
+See the [`skills` CLI documentation](https://github.com/vercel-labs/skills) for supported agents
+and options.
+
+### Option 2: Claude Code Plugin
+
+Install through Claude Code's plugin system to get automatic updates and team distribution:
+
+```bash
+# Add this repository as a marketplace
+/plugin marketplace add jurokapsiar/acc-assess
+
+# Install the plugin
+/plugin install acc-assess@acc-assess
+```
+
+On Claude Code 2.1.275 or later, one step also works:
+`/plugin install acc-assess --marketplace jurokapsiar/acc-assess`.
+
+**Setup is automatic.** The plugin's `SessionStart` hook runs `ensure-setup.mjs` in the background
+when a session starts. It installs whatever is missing in the installed plugin copy and is a no-op
+otherwise. A plugin update installs into a new version folder, so the hook sets that folder up again.
+Chromium is cached in `~/.cache/ms-playwright`, so it is not downloaded again. If the agent uses a
+skill before the background run finishes, its step 0 waits for that run. Hook output goes to
+`.cache/setup.log` in the skill folder.
+
+To run setup by hand, use the installed copy under `cache/`, not the clone under `marketplaces/`.
+Only the `cache/` copy is the one Claude Code runs:
+
+```bash
+cd ~/.claude/plugins/cache/acc-assess/acc-assess/<version>/skills/accessibility-assessment
+npm run setup
+```
+
+Skills from the plugin are namespaced, for example `/acc-assess:accessibility-assessment`. Pick
+one install method: installing through both the plugin and `skills` lists every skill twice.
+
+### Option 3: Other Agent Installations
+
+Agent Skills are supported by Claude Code, Cursor, GitHub Copilot, Codex, Gemini CLI, OpenCode
+and other clients. Install the directories that contain `SKILL.md`, at the client's documented
+skill path. If a client has no installer:
+
+1. Copy all four `skills/*/` folders, side by side, into its skill directory.
+2. Run `npm run setup` in `accessibility-assessment/`.
+
+### Option 4: Download Release
+
+1. Download and extract the latest release from
+   [GitHub Releases](https://github.com/jurokapsiar/acc-assess/releases).
+2. Copy the four folders in `skills/`, keeping them side by side, to:
+   - Global: `~/.claude/skills/` (for example `~/.claude/skills/accessibility-assessment`)
+   - Project: `/path/to/your/project/.claude/skills/`
+3. Go to the assessment skill directory and run setup:
+   ```bash
+   cd ~/.claude/skills/accessibility-assessment  # or your project path
+   npm run setup
+   ```
+
+### Optional: real screen readers
+
+`screen-reader-validation` runs everywhere with its mock driver. Real NVDA or VoiceOver runs need
+its optional `@guidepup/guidepup` dependency:
+
+1. Run `npm install` in the `screen-reader-validation` folder.
+2. Run `node scripts/sr.mjs preflight` to see what else is needed.
+
+See [Screen reader validation](#screen-reader-validation).
+
+### Verify Installation
+
+1. Check setup: `npm run setup:check` in the `accessibility-assessment` folder prints `ready`.
+2. Check the agent sees the skills:
+   - Claude Code plugin: `/plugin` lists `acc-assess` as enabled, and typing `/acc-assess:`
+     autocompletes the four skills.
+   - Other installs: the agent's skill list shows them.
+3. Optionally, run `npm test` in `accessibility-assessment`, `scope-definition` and
+   `screen-reader-validation`. The tests use local fixtures and need no app.
+4. Start your app, then ask the agent something simple, such as
+   *"Run an accessibility assessment of the home page at http://localhost:3000"*.
+
+## Quick Start
+
+After installation, start your app and ask your agent to assess it. The agent:
+
+1. Builds or updates `.a11y/inventory.json` (features, screens, states).
+2. Runs axe-core, AbleDOM and the Playwright interaction checks.
+3. Reviews the results against WCAG 2.2 and APG.
+4. Writes `.a11y/reports/<timestamp>/report.html`, with screenshots, failed criteria, repro steps
+   and `fix-*.md` files.
+
+These skills never edit your source code. Fixes are applied by you or by a separate agent step.
+
+## Usage Examples
+
+- *"Run an accessibility assessment of http://localhost:5173"*
+- *"Update the a11y inventory, then assess only the settings dialog on desktop and mobile"*
+- *"Scope the assessment to the invite dialog and its validation error"*
+- *"What should we test for accessibility in this PR?"*
+- *"Check WCAG compliance of the checkout flow at AAA"*
+- *"Verify the fix in .a11y/reports/<timestamp>/fix-…md"* (after the fix is applied and the app is running)
+- *"Check the checkout journey with NVDA"* / *"validate the invite dialog with VoiceOver"*
+
+## Command-line walkthrough
+
+The scripts the agent runs, if you want to drive them yourself:
+
+```bash
 cd <your-app>        # app must be running
 # 1. Inventory: ask the agent to build .a11y/inventory.json (see "Feature and screen discovery")
 node <skill>/scripts/inventory.mjs validate
@@ -509,11 +659,14 @@ Rules: [rules.md](rules.md#interaction-modality-checks). Touch is not automated.
 ## Repository layout
 
 ```text
+.claude-plugin/                   plugin.json + marketplace.json (Claude Code plugin wrapper)
+hooks/hooks.json                  plugin SessionStart hook: runs ensure-setup.mjs in the background
 skills/
 ├── accessibility-assessment/
 │   ├── SKILL.md                  workflow, CLI, report format
 │   ├── references/               inventory schema, criteria coverage, manual-review checklist, source tracking
 │   ├── scripts/
+│   │   ├── ensure-setup.mjs      idempotent setup (`npm run setup`): deps, Chromium, knowledge/
 │   │   ├── fetch-knowledge.mjs   scrapes WCAG 2.2 + APG into knowledge/
 │   │   ├── inventory.mjs         list | validate | verify | snapshot
 │   │   ├── assess.mjs            runs the checks, writes results.json
@@ -546,3 +699,9 @@ docs/images/                      screenshots used in this README
 rules.md                          catalog of every rule id, its criteria, engine and kind
 new-tools.md                      proposed tooling for the gaps
 ```
+
+### Releasing
+
+Plugin users get an update only when `version` in `.claude-plugin/plugin.json` changes. Bump it,
+and `metadata.version` in each `SKILL.md`, together. Tag the commit and publish a GitHub release
+for Option 4 (a publishing GitHub Action is planned, see [`TODO.md`](TODO.md)).

@@ -1,0 +1,18 @@
+{
+  "description": "One-time setup of the accessibility-assessment skill (npm deps, Playwright Chromium, WCAG/APG knowledge). Runs in the background; installs only what is missing, so it re-runs after plugin updates and is a no-op otherwise.",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/skills/accessibility-assessment/scripts/ensure-setup.mjs\" --hook",
+            "async": true,
+            "timeout": 1200
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -15,7 +15,7 @@ export const SIBLING_LIB_DIR = path.join(SIBLING_SCRIPTS_DIR, 'lib');
 
 export function assertSiblingInstalled() {
   if (!fs.existsSync(SIBLING_SKILL_DIR)) {
-    throw new Error(`Sibling skill not found: ${SIBLING_SKILL_DIR} (scope-definition must sit next to accessibility-assessment)`);
+    throw new Error(`Sibling skill not found: ${SIBLING_SKILL_DIR} (scope-definition must sit next to accessibility-assessment). Install all acc-assess skills together, e.g. "npx skills add jurokapsiar/acc-assess --skill '*'".`);
   }
   const pkgPath = path.join(SIBLING_SKILL_DIR, 'package.json');
   if (!fs.existsSync(pkgPath)) {

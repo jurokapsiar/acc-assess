@@ -31,6 +31,7 @@ bun-debug.log*
 # accessibility-assessment skill: generated
 skills/accessibility-assessment/knowledge/
 skills/accessibility-assessment/.cache/
+skills/accessibility-assessment/.setup.lock/
 .a11y/reports/
 .a11y/inventory-shots/
 skills/accessibility-assessment/tests/.out/

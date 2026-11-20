@@ -1,6 +1,12 @@
 ---
 name: screen-reader-validation
 description: 'Replay scoped user journeys with a real screen reader (NVDA on Windows, VoiceOver on macOS) through Guidepup and report what was actually announced: "check this flow with a screen reader", "what does NVDA say on the checkout journey", "validate the invite dialog with VoiceOver", "screen reader test the scope". Consumes scope-definition output (scope.json + journeys.json) unchanged; records every action, the narration before/after and a screenshot, and turns the narration into WCAG-mapped findings (unlabelled controls, missing roles/states, unannounced dialogs/status/errors, focus not moved/returned, silent navigation, reading order, landmarks/headings) in results.json and sr-report.html.'
+license: MIT
+compatibility: Requires the accessibility-assessment skill installed in a sibling directory (with its setup done) and Node.js 20+. Real runs need NVDA (Windows) or VoiceOver (macOS) via the optional @guidepup/guidepup dependency; the mock driver runs anywhere.
+metadata:
+  author: Juraj Kapsiar
+  version: "0.1.0"
+allowed-tools: Bash(node:*) Bash(npm:*) Read Write
 ---
 
 # Screen Reader Validation
@@ -75,7 +81,7 @@ The skill borrows Playwright and the shared libraries from the sibling `accessib
 skill (same convention as `scope-definition` / `fix-verify`), plus Guidepup:
 
 ```bash
-cd <accessibility-assessment-skill-dir> && npm run setup     # once: Playwright + Chromium
+node <accessibility-assessment-skill-dir>/scripts/ensure-setup.mjs   # step 0, idempotent: Playwright + Chromium + knowledge
 cd <screen-reader-validation-skill-dir> && npm install       # optional dependency @guidepup/guidepup
 node scripts/sr.mjs preflight                                # tells you what else is needed
 ```

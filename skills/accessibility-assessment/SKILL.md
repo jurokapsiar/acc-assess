@@ -1,6 +1,12 @@
 ---
 name: accessibility-assessment
 description: 'Assess a web UI for accessibility against WCAG 2.2 success criteria and WAI-ARIA APG patterns, and produce an axe-style HTML report with screenshots, failed criteria, repro steps and fix suggestions. Maintains an inventory of features, screens (pages, dialogs, menus, popovers) and states so selected features or screens can be assessed. Uses axe-core on Playwright for static analysis and AbleDOM for real-time analysis. Triggers on requests like "accessibility assessment", "a11y audit", "check WCAG compliance", "assess this screen/dialog for accessibility", "update the a11y inventory".'
+license: MIT
+compatibility: Requires Node.js 20+ and npm. First setup needs network access (npm packages, Playwright Chromium, WCAG 2.2 and APG pages from w3.org).
+metadata:
+  author: Juraj Kapsiar
+  version: "0.1.0"
+allowed-tools: Bash(node:*) Bash(npm:*) Read Write
 ---
 
 # Accessibility Assessment
@@ -17,15 +23,17 @@ Assess a running web application against WCAG 2.2 and the WAI-ARIA Authoring Pra
 ## Prerequisites
 
 - Node.js 20+.
-- One-time setup in the skill folder:
+- **Step 0, every session:** make sure setup is complete. The script is idempotent: it installs
+  only what is missing (npm deps, Playwright Chromium, the WCAG 2.2 + APG `knowledge/` cache), and
+  if another setup run is in progress (for example the Claude Code plugin's background hook), it
+  waits for it instead of installing twice:
   ```bash
-  cd <skill-dir> && npm run setup      # installs deps + Playwright Chromium
-  npm run knowledge                     # scrapes WCAG 2.2 criteria + APG patterns into knowledge/
+  node <skill-dir>/scripts/ensure-setup.mjs          # same as `npm run setup` in <skill-dir>
   ```
-  `knowledge/` is generated and git-ignored. Re-run `npm run knowledge` to refresh it.
+  `knowledge/` is generated and git-ignored. Re-run `npm run knowledge` in `<skill-dir>` to refresh it.
 - The target app must be running and reachable. If it isn't, start it and record the command in `app.start` in the inventory.
 - If Chromium can't be installed, pass `--channel msedge` or `--channel chrome`.
-- Long-running commands (`npm run setup`, `npm run knowledge`, `assess.mjs`, `verify.mjs`, `scope.mjs verify`) can take minutes. Give them a generous timeout (10+ minutes) or run them in the background and poll their output; don't kill them early or re-run them concurrently into the same run folder.
+- Long-running commands (`ensure-setup.mjs` / `npm run setup` on first run, `npm run knowledge`, `assess.mjs`, `verify.mjs`, `scope.mjs verify`) can take minutes. Give them a generous timeout (10+ minutes) or run them in the background and poll their output; don't kill them early or re-run them concurrently into the same run folder.
 
 All commands below run **from the target app root**:
 

@@ -1,0 +1,21 @@
+{
+  "name": "acc-assess",
+  "owner": {
+    "name": "Juraj Kapsiar"
+  },
+  "metadata": {
+    "description": "Accessibility assessment skills for coding agents"
+  },
+  "plugins": [
+    {
+      "name": "acc-assess",
+      "source": "./",
+      "description": "WCAG 2.2 + WAI-ARIA APG accessibility assessment, scope definition, fix verification and screen reader validation skills.",
+      "homepage": "https://github.com/jurokapsiar/acc-assess",
+      "repository": "https://github.com/jurokapsiar/acc-assess",
+      "license": "MIT",
+      "category": "testing",
+      "keywords": ["accessibility", "a11y", "wcag", "aria", "playwright", "screen-reader"]
+    }
+  ]
+}

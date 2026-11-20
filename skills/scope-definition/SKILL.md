@@ -1,6 +1,12 @@
 ---
 name: scope-definition
 description: 'Turn a free-text request into an exact, replay-verified accessibility assessment scope: "scope the assessment to the invite dialog and its validation error", "assess only the checkout flow on mobile", "define user journeys for this change", "what should we test for this PR", "record a flow". Produces scope.json (exact target keys, what was excluded/unresolved) and journeys.json (replayable steps) that the sibling accessibility-assessment and fix-verify skills consume unchanged.'
+license: MIT
+compatibility: Requires the accessibility-assessment skill installed in a sibling directory (with its setup done) and Node.js 20+.
+metadata:
+  author: Juraj Kapsiar
+  version: "0.1.0"
+allowed-tools: Bash(node:*) Bash(npm:*) Read Write
 ---
 
 # Scope Definition
@@ -47,7 +53,7 @@ This skill has no dependencies of its own: it borrows the sibling `accessibility
 skill's Playwright install and shared libraries (same convention as `fix-verify`).
 
 ```bash
-cd <accessibility-assessment-skill-dir> && npm run setup   # once, if not already done
+node <accessibility-assessment-skill-dir>/scripts/ensure-setup.mjs   # step 0, idempotent
 ```
 
 The target app must be running and reachable at `inventory.app.baseUrl` (or `--url`).

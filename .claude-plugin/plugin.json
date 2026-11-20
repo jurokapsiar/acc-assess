@@ -1,0 +1,23 @@
+{
+  "name": "acc-assess",
+  "version": "0.1.0",
+  "description": "Accessibility assessment skills for coding agents: WCAG 2.2 + WAI-ARIA APG assessment with axe-core, AbleDOM and Playwright, scoped runs, fix verification and screen reader validation.",
+  "author": {
+    "name": "Juraj Kapsiar"
+  },
+  "homepage": "https://github.com/jurokapsiar/acc-assess",
+  "repository": "https://github.com/jurokapsiar/acc-assess",
+  "license": "MIT",
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "wcag",
+    "aria",
+    "apg",
+    "axe-core",
+    "playwright",
+    "screen-reader",
+    "agent-skill",
+    "claude-code"
+  ]
+}

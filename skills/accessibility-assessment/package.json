@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Playwright + axe-core + AbleDOM accessibility assessment tooling for the accessibility-assessment skill.",
   "scripts": {
-    "setup": "npm install && npx playwright install chromium",
+    "setup": "node scripts/ensure-setup.mjs",
+    "setup:check": "node scripts/ensure-setup.mjs --check",
     "knowledge": "node scripts/fetch-knowledge.mjs",
     "inventory": "node scripts/inventory.mjs",
     "assess": "node scripts/assess.mjs",
