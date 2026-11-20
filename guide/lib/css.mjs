@@ -124,6 +124,8 @@ p{margin:0 0 var(--sp-3)}
 .io code{color:var(--ink)}
 .never{display:flex;gap:14px;align-items:flex-start;margin-top:var(--sp-5);padding:20px 24px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--t-fixes)}
 .never svg{flex:none;margin-top:2px}
+.research{background:var(--t-review)}
+#install .box .bd p{margin:0 0 var(--sp-3)}
 .never p{margin:0}
 
 /* skills */

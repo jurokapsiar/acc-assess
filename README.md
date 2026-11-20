@@ -6,7 +6,7 @@
 
 **WARNING:** Agentic review doews not replace user testing.
 
-An agent skill that assesses a web UI against **WCAG 2.2** success criteria and **WAI-ARIA APG** patterns. It produces an axe-style HTML report with screenshots, failed criteria, repro steps and fix suggestions.
+Agent skills that analyze a web UI against **WCAG 2.2** success criteria and **WAI-ARIA APG** patterns. They combine axe-core static analysis, AbleDOM real-time analysis and APG pattern review for a comprehensive analysis, but they still do not replace manual testing. For each issue they trace the failure to its root cause in your source code and propose a fix, which can be verified after it is applied. They also build user journeys from a plain-language request and validate them with keyboard-only navigation and real screen readers (NVDA, VoiceOver). The output is an axe-style HTML report with screenshots, failed criteria, repro steps, the source location and a fix file for each issue.
 
 - **Skill:** [`skills/accessibility-assessment/SKILL.md`](skills/accessibility-assessment/SKILL.md), plus the companion [`skills/fix-verify/SKILL.md`](skills/fix-verify/SKILL.md), [`skills/scope-definition/SKILL.md`](skills/scope-definition/SKILL.md) and [`skills/screen-reader-validation/SKILL.md`](skills/screen-reader-validation/SKILL.md)
 - **Rule catalog:** [`rules.md`](rules.md)

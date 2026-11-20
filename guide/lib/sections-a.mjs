@@ -67,9 +67,9 @@ export function hero(sum, img) {
 <div>
 <p class="eyebrow">WCAG 2.2 + WAI-ARIA APG</p>
 <h1 id="top-h">Accessibility-assess skills</h1>
-<p class="lede">A set of skills that validate accessibility based on user journeys, using deterministic tools and agents.</p>
-<p class="note">This does not replace manual testing. It aims to improve its accuracy.</p>
-<div class="cta"><a class="btn primary" href="#workflow">See the workflow</a><a class="btn" href="#catalog">Browse the criteria catalog</a></div>
+<p class="lede">A set of skills that validate accessibility based on user journeys, using deterministic tools and agents. axe-core static analysis, AbleDOM real-time analysis and WAI-ARIA APG pattern review combine into a comprehensive analysis.</p>
+<p class="note">It still does not replace manual testing. It aims to make manual testing more accurate. <strong>Research phase:</strong> no evals yet, and validated with few models so far.</p>
+<div class="cta"><a class="btn primary" href="#install">Install</a><a class="btn" href="#workflow">See the workflow</a><a class="btn" href="#catalog">Browse the criteria catalog</a></div>
 <dl class="stats">
 <div><dt>rules</dt><dd>${sum.rules}</dd></div>
 <div><dt>WCAG 2.2 criteria</dt><dd>${sum.criteria}</dd></div>
@@ -78,6 +78,25 @@ export function hero(sum, img) {
 </dl>
 </div>
 <figure class="frame"><div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>report.html</span></div>${img('report-summary.png', 'Report summary: half-donut charts for issues and criteria, issue groups by severity and a strip of screen thumbnails.')}</figure>
+</div></section>`;
+}
+
+const INSTALL = [
+  ['Option 1 · skills CLI', 'recommended', 't-fixes', 'Vercel\'s <a href="https://github.com/vercel-labs/skills">skills</a> CLI installs into the native skill folders of Claude Code, Cursor, Codex, GitHub Copilot, Gemini CLI, Antigravity and more. Omit <code>--global</code> for a project install; add <code>--agent claude-code cursor</code> to pick agents.',
+    'npx skills add jurokapsiar/acc-assess --skill \'*\' --global --yes\ncd ~/.agents/skills/accessibility-assessment   # or the path the CLI printed\nnpm run setup'],
+  ['Option 2 · Claude Code plugin', 'auto-updates', 't-scope', 'Setup is automatic: a background <code>SessionStart</code> hook installs whatever is missing in the installed plugin copy, and again after each plugin update. Skills are namespaced, e.g. <code>/acc-assess:accessibility-assessment</code>.',
+    '/plugin marketplace add jurokapsiar/acc-assess\n/plugin install acc-assess@acc-assess'],
+  ['Option 3 · Other agents', 'manual', 't-journeys', 'Copy all four <code>skills/*/</code> folders, side by side, into the agent\'s documented skill directory, then run setup in <code>accessibility-assessment/</code>.',
+    'cp -r skills/* <agent-skills-dir>/\ncd <agent-skills-dir>/accessibility-assessment\nnpm run setup'],
+  ['Option 4 · Release download', 'planned', 't-review', 'A GitHub Action will publish a <code>skills/</code> zip with every version tag (tests and plugin validation first). Until the first release, download the repository ZIP from GitHub and copy the four <code>skills/*/</code> folders as in option 3.',
+    'cd ~/.claude/skills/accessibility-assessment\nnpm run setup'],
+];
+
+export function install() {
+  return `<section id="install" aria-labelledby="install-h"><div class="wrap">
+<div class="shead"><span class="num" aria-hidden="true">01</span><h2 id="install-h">Install</h2><p>Four <a href="https://agentskills.io">Agent Skills</a> plus a Claude Code plugin wrapper. Install all four together: the companion skills load Playwright and shared code from <code>accessibility-assessment</code>. Needs Node.js 20+, npm, and network access on first setup.</p></div>
+<div class="grid g2">${INSTALL.map(([title, tag, t, text, cmd]) => `<article class="box ${t} reveal"><div class="hd"><h3>${esc(title)}</h3><span class="who">${esc(tag)}</span></div><div class="bd"><p>${text}</p><pre><code>${esc(cmd)}</code></pre></div></article>`).join('')}</div>
+<div class="never research"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2h6M10 2v6l-6 11a2 2 0 0 0 2 3h12a2 2 0 0 0 2-3L14 8V2" fill="#fff" stroke="#1f1f1f" stroke-width="1.6" stroke-linejoin="round"/><path d="M7 15h10" stroke="#1f1f1f" stroke-width="1.6"/></svg><p><strong>Research phase.</strong> The skills still lack evals and validation across models. Agentic review does not replace user testing. <code>npm run setup</code> is idempotent: it installs only what is missing (npm deps, Playwright Chromium, the WCAG 2.2 + APG knowledge cache), and <code>npm run setup:check</code> prints <code>ready</code> when done.</p></div>
 </div></section>`;
 }
 
@@ -93,7 +112,7 @@ const STEPS = [
 
 export function workflow() {
   return `<section id="workflow" aria-labelledby="workflow-h"><div class="wrap">
-<div class="shead"><span class="num" aria-hidden="true">01</span><h2 id="workflow-h">Workflow</h2><p>Seven steps, four skills. Each step writes a file the next step reads, so you can stop, inspect and resume.</p></div>
+<div class="shead"><span class="num" aria-hidden="true">02</span><h2 id="workflow-h">Workflow</h2><p>Seven steps, four skills. Each step writes a file the next step reads, so you can stop, inspect and resume.</p></div>
 <div class="flow reveal">${flowH()}${flowV()}</div>
 <ol class="steps">${STEPS.map(([skill, t, title, text, cmd, outs, who]) => `<li class="box ${t} reveal"><div class="hd"><h3>${esc(title)}</h3><span class="who">${esc(who)}</span></div><div class="bd"><p>${esc(text)}</p><pre><code>${esc(cmd)}</code></pre><div class="io"><span>Skill: <code>${esc(skill)}</code></span><span>Writes: ${outs.map((o) => `<code>${esc(o)}</code>`).join(' ')}</span></div></div></li>`).join('')}</ol>
 <div class="never"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.5 9.3-8 11-4.5-1.7-8-6-8-11V5z" fill="#fff" stroke="#1f1f1f" stroke-width="1.6"/><path d="M8 12l3 3 5-6" fill="none" stroke="#1f1f1f" stroke-width="1.8"/></svg><p><strong>The skills never edit your source code.</strong> They read, run and report. Fixes are proposals in <code>fix-*.md</code>. Editing code is out of scope due to code base specifics; apply them with your own process, then fix-verify proves the result.</p></div>
@@ -109,7 +128,7 @@ const SKILLS = [
 
 export function skills() {
   return `<section id="skills" aria-labelledby="skills-h"><div class="wrap">
-<div class="shead"><span class="num" aria-hidden="true">02</span><h2 id="skills-h">The skills</h2><p>Ask in plain language. Each skill knows its scripts and hands off to the next.</p></div>
+<div class="shead"><span class="num" aria-hidden="true">03</span><h2 id="skills-h">The skills</h2><p>Ask in plain language. Each skill knows its scripts and hands off to the next.</p></div>
 <div class="grid g4">${SKILLS.map(([name, t, what, list, prompt, out]) => `<article class="box skill ${t} reveal"><div class="hd"><h3><code>${esc(name)}</code></h3></div><div class="bd"><p>${esc(what)}</p><ul>${list.map((l) => `<li>${esc(l)}</li>`).join('')}</ul><p class="prompt">${esc(prompt)}</p><p class="out">Output: ${esc(out)}</p></div></article>`).join('')}</div>
 </div></section>`;
 }
@@ -124,7 +143,7 @@ const MODS = [
 export function modalities(sum) {
   const k = (s) => s.split(',').map((x) => `<kbd>${esc(x)}</kbd>`).join(' ');
   return `<section id="modalities" aria-labelledby="modalities-h"><div class="wrap">
-<div class="shead"><span class="num" aria-hidden="true">03</span><h2 id="modalities-h">Interaction modalities</h2><p>Every journey step records how it was performed, so a run can't pass just because the runner clicked through. Described as specified; names and flags may still be refined.</p></div>
+<div class="shead"><span class="num" aria-hidden="true">04</span><h2 id="modalities-h">Interaction modalities</h2><p>Every journey step records how it was performed, so a run can't pass just because the runner clicked through. Described as specified; names and flags may still be refined.</p></div>
 <div class="grid g4 mods">${MODS.map(([m, phase, keys, rules, judge]) => `<article class="box t-modalities reveal"><div class="hd"><h3><code>${m}</code></h3></div><div class="bd"><p>${esc(keys)}</p><dl><dt>Phase</dt><dd>${esc(phase)}</dd><dt>Rules</dt><dd><code>${esc(rules)}</code></dd><dt>Judged</dt><dd>${esc(judge)}</dd></dl></div></article>`).join('')}</div>
 <p class="muted small" style="margin-top:14px">Run with <code>--modality keyboard,mouse</code> (assessment) or <code>--modality sr-keyboard,sr-navigation</code> (screen reader); <code>all</code> runs both of a skill's phases. Each modality is a separate replay in a fresh browser. Journeys without modalities keep the default behaviour.</p>
 <div class="sub"><h3>When the keyboard gets stuck: the escalation ladder</h3><p>The runner climbs only as far as needed, records each rung, and keeps going.</p></div>

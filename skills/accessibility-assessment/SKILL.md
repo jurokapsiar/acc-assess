@@ -219,9 +219,14 @@ Write the results next to `results.json`:
 - A rule-id key applies to every finding with that rule, whatever its engine (`tabindex` and `nested-interactive` exist in both axe and AbleDOM). Use finding ids to target one engine.
 - `changes[].file` is relative to the source root (same as `node.source.file`). `line`..`endLine` is replaced by `proposed` (all lines, with indentation); to delete a line, leave it out of `proposed`.
 - Any field in an annotation overrides the finding's own (for example `"kind": "failure"`), so don't set fields you don't mean to change.
+- To promote a `review` to a failure after you confirmed it, set `"kind": "failure"` (e.g. `"initial-focus-outside-overlay": { "kind": "failure", "reviewed": true, ... }`). It moves to Issues and counts as a failure, but the report does not mark it as agent-reviewed and its `source` stays the engine's, so verify treats it like any engine failure.
+- Take `changes[].line`/`endLine` from `grep -n` or by reading the file now, never from memory. `fixes.mjs` keeps a fix `draft` with a warning when the replaced lines don't contain the affected element.
+- Two edits that touch the same lines (even for different rules) go in one annotation; `fixes.mjs` warns when ready fix files overlap.
+- Escape-to-close stays an APG `suggestion` with no WCAG criterion, even when the same overlay already has `dialog-role-missing` or `initial-focus-outside-overlay`.
+- Write `annotations.json` and `agent-findings.json` with `JSON.stringify`, or check them before running `report.mjs`: `node -e "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8'))" <file>` (unescaped quotes in `fix`/`summary` text are the usual error).
 - `report.html` shows `fix` and `sourceFile`; `why` and `changes` appear only in the fix files. Dismissal notes aren't shown anywhere but `annotations.json`.
 
-A rule with no reviewed `changes` stays a `draft` fix file: `fixes.mjs` (Step 4) still generates it, with a note on what to add.
+A rule with no reviewed `changes` stays a `draft` fix file: `fixes.mjs` (Step 4) still generates it, with a note on what to add. Suggestion fix files may legitimately stay `draft`: they are optional.
 
 ```jsonc
 // agent-findings.json – same shape as results.findings; kind: failure | review | suggestion
@@ -252,7 +257,9 @@ Writes one `<run>/fix-<kind>-<source>-<rule>[--<component>].md` per rule **and c
 
 A fix file's `Status` is:
 - **`ready`** — every annotation applying to the file's findings has `reviewed: true`, and there is at least one `changes` entry, each with an existing `file`, an integer `line` ≥ 1, an `endLine` (default `line`) inside the file, and a string `proposed`. The file shows the current and proposed code.
-- **`draft`** — anything else. The command prints what is missing or invalid; the file lists known source locations and the next step.
+- **`draft`** — anything else, including a change whose `line`..`endLine` text doesn't mention the affected element (its tag/id/class/attribute/text); the file then carries a `WARNING`. The command prints what is missing or invalid; the file lists known source locations and the next step.
+
+If ready files change overlapping lines of one source file, each file gets a warning naming the other (and stderr prints one); they stay `ready`, so merge the edits into one annotation.
 
 Annotations keyed by rule apply to every component file of that rule; each `changes` entry goes to the file whose elements are rendered in `changes[].file`, else one whose owner chain contains it (a call site), else the rule-only file. A component file left without a change stays `draft`.
 

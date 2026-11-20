@@ -193,8 +193,22 @@ export function occurrenceHtml({ f, n, also }, g, { targets, where, paraHtml }) 
       ${f.fix && f.fix !== g.fix ? `<p><strong>Fix:</strong> ${esc(f.fix)}</p>` : ''}
       <details><summary>Steps to reproduce</summary><ol class="steps">${(f.repro ?? t?.repro ?? []).map((s) => `<li>${esc(s)}</li>`).join('')}</ol></details>
     </div>
-    ${n.screenshot ? `<a class="shot" href="${attr(n.screenshot)}"><img src="${attr(n.screenshot)}" alt="Screenshot of the affected element" loading="lazy"></a>` : ''}
+    ${n.screenshot ? thumbHtml(n, t) : ''}
   </li>`;
+}
+
+// Assess-detected nodes already get a node+padding clip at capture time. A node that points at the
+// target's full-page shot (agent findings) is cropped here instead, using its `box` (document space)
+// plus padding clamped to the page; the link still opens the full shot. No box or shot size: full image.
+function thumbHtml(n, t) {
+  const img = `<img src="${attr(n.screenshot)}" alt="Screenshot of the affected element" loading="lazy">`;
+  const W = t?.shot?.width, H = t?.shot?.height, b = n.box;
+  if (!(b && W > 0 && H > 0 && n.screenshot === t.shot.file && b.width > 0 && b.height > 0)) return `<a class="shot" href="${attr(n.screenshot)}">${img}</a>`;
+  const pad = 48;
+  const x = Math.max(0, b.x - pad), y = Math.max(0, b.y - pad);
+  const w = Math.min(W - x, b.width + pad * 2), h = Math.min(H - y, b.height + pad * 2);
+  const pct = (v) => `${+(v * 100).toFixed(3)}%`;
+  return `<a class="shot shot-crop" href="${attr(n.screenshot)}" title="Cropped to the element; opens the full screenshot" style="aspect-ratio:${+w.toFixed(1)}/${+h.toFixed(1)};max-width:${Math.round(w)}px">${img.replace('<img ', `<img style="width:${pct(W / w)};left:${pct(-x / w)};top:${pct(-y / h)}" `)}</a>`;
 }
 
 // Resolved source location plus the owner chain (when known). The first entry is where the
@@ -1107,6 +1121,7 @@ table{border-collapse:collapse;width:100%;background:var(--panel)}
 pre{background:rgba(255,255,255,.8);border:1px solid var(--line-soft);padding:8px 10px;border-radius:4px;overflow-x:auto;white-space:pre-wrap;word-break:break-all;margin:6px 0}
 .summary{color:var(--muted);font-size:.9rem}
 .steps,.also ul{margin:6px 0;padding-left:20px}
+.shot.shot-crop{display:block;position:relative;overflow:hidden;border:1px solid var(--line);border-radius:4px}.shot.shot-crop img{position:absolute;max-width:none;border:0;border-radius:0}
 .shot img{display:block;max-width:100%;border:1px solid var(--line);border-radius:4px;background:#fff}
 details>summary{cursor:pointer;color:var(--muted)}
 /* ---- disclosure ---- */

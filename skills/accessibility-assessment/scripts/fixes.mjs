@@ -22,6 +22,7 @@ import { groupFindings, mergeAgentInput, isOutOfScope, slug, groupId } from './l
 import { fileURLToPath } from 'node:url';
 import { resolveSourceRoot } from './lib/source.mjs';
 import { loadInventory, resolveTargets } from './lib/inventory.mjs';
+import { textContainsNode, nodeTokens } from './lib/target-match.mjs';
 
 const VERIFY_SCRIPT = normalizeSlashes(path.join(path.dirname(fileURLToPath(import.meta.url)), 'verify.mjs'));
 
@@ -85,8 +86,11 @@ let ready = 0;
 let draft = 0;
 const draftNotes = [];
 const planNotes = [];
-for (const e of entries) {
-  const { status, markdown, problems, planHits } = buildFixFile(e);
+const built = entries.map((e) => ({ e, ...buildFixFile(e) }));
+const overlapNotes = overlapWarnings(built);
+for (const { e, status, markdown: md, problems, planHits } of built) {
+  const warn = overlapNotes.get(e.filename) ?? [];
+  const markdown = warn.length ? md.replace('\n\n## Occurrences\n', `\n\n**Warning:** ${warn.join('; ')}\n\n## Occurrences\n`) : md;
   fs.writeFileSync(path.join(runDir, e.filename), markdown);
   if (status === 'ready') ready++;
   else {
@@ -115,6 +119,25 @@ for (const line of draftNotes) console.log(line);
 for (const line of planNotes) console.log(line);
 for (const line of unassigned) console.log(line);
 if (removed.length) console.log(`removed stale: ${removed.join(', ')}`);
+
+// Ready fix files whose changes overlap line ranges of one source file. Warn only: overlaps can be
+// identical edits from sibling components, and demoting would block both files with no obvious loser.
+function overlapWarnings(list) {
+  const notes = new Map();
+  const ranges = list.filter((b) => b.status === 'ready').flatMap((b) => b.e.changes.map((c) => ({ name: b.e.filename, file: normalizeSlashes(c.file), from: c.line, to: c.endLine ?? c.line })));
+  for (const a of ranges) {
+    for (const b of ranges) {
+      if (a.name >= b.name || a.file !== b.file || a.from > b.to || b.from > a.to) continue;
+      const msg = (self, other) => `${self.file}:${self.from}-${self.to} overlaps ${other.file}:${other.from}-${other.to} in ${other.name}; merge the edits into one annotation`;
+      for (const [x, y] of [[a, b], [b, a]]) {
+        const m = msg(x, y);
+        notes.set(x.name, [...new Set([...(notes.get(x.name) ?? []), m])]);
+        console.error(`warning: ${x.name}: ${m}`);
+      }
+    }
+  }
+  return notes;
+}
 
 // ---------------------------------------------------------------- split by component
 
@@ -192,7 +215,8 @@ function assignChanges(list) {
 function buildFixFile(e) {
   const { kind, group, ruleId, source, comp } = e;
   const ann = { ...e.ann, changes: e.changes };
-  const problems = ann.changes.flatMap((c, i) => validateChange(c).map((m) => `change ${i + 1}: ${m}`));
+  const targetNodes = group.items.flatMap((f) => f.nodes ?? []);
+  const problems = ann.changes.flatMap((c, i) => [...validateChange(c), ...plausibilityProblems(c, targetNodes)].map((m) => `change ${i + 1}: ${m}`));
   const status = ann.reviewed && ann.changes.length && !problems.length ? 'ready' : 'draft';
   const planHits = planTextHits(ann.changes, group);
   const issue = e.fullKey;
@@ -293,6 +317,17 @@ function validateChange(c) {
   }
   if (typeof c.proposed !== 'string') out.push('"proposed" must be a string');
   return out;
+}
+
+// Warns when the replaced lines don't mention any affected node (wrong line numbers). Skipped for
+// nodeless findings and unreadable ranges (validateChange reports those).
+function plausibilityProblems(c, nodes) {
+  const abs = c.file ? path.resolve(sourceRootAbs, c.file) : null;
+  if (!nodes.length || !abs || !fs.existsSync(abs) || !Number.isInteger(c.line) || c.line < 1) return [];
+  const text = fs.readFileSync(abs, 'utf8').split(/\r?\n/).slice(c.line - 1, c.endLine ?? c.line).join('\n');
+  if (nodes.some((n) => textContainsNode(text, n))) return [];
+  const want = [...new Set(nodes.flatMap((n) => { const t = nodeTokens(n); return t.tokens.length ? t.tokens : [`<${t.tag}`]; }))].slice(0, 6).join(', ');
+  return [`WARNING: lines ${c.line}-${c.endLine ?? c.line} of ${c.file} do not appear to contain the affected element (looked for ${want}); the line numbers may be wrong. Re-check with grep -n`];
 }
 
 // Inventory plans of the group's targets, keyed by target key (null when the inventory can't be

@@ -2,7 +2,7 @@
 // list after agent annotations, not the raw results.json areas.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { scopeSection, journeysSection, fixReportHtml, ring, issueMap, screensOf, stickyNav } from '../scripts/lib/render.mjs';
+import { occurrenceHtml, scopeSection, journeysSection, fixReportHtml, ring, issueMap, screensOf, stickyNav } from '../scripts/lib/render.mjs';
 import { mergeAgentInput } from '../scripts/lib/findings.mjs';
 
 const box = (x) => ({ x, y: 10, width: 20, height: 20 });
@@ -227,4 +227,16 @@ test('stickyNav: omits sections not present in items, keeps brand and href/count
   assert.match(html, /<a class="nl t-summary" href="#summary">/);
   assert.match(html, /<a class="nl t-issues" href="#issues">[^]*<span class="nc">3<\/span>/);
   assert.doesNotMatch(html, /t-scope/, 'sections not passed in are simply absent, not disabled');
+});
+
+test('occurrence thumbnail: a node pointing at the full-page shot is cropped to its box plus padding; otherwise the image is untouched', () => {
+  const t = { key: 'k', screen: { name: 'S' }, state: { name: 'D' }, viewport: { name: 'desktop' }, shot: { file: 'shots/k.png', width: 1280, height: 800 } };
+  const ctx = { targets: new Map([['k', t]]), where: () => '' };
+  const render = (n) => occurrenceHtml({ f: { target: 'k', repro: [] }, n, also: [] }, {}, ctx);
+  const cropped = render({ selector: '#a', screenshot: 'shots/k.png', box: { x: 10, y: 160, width: 100, height: 40 } });
+  assert.match(cropped, /class="shot shot-crop" href="shots\/k\.png"/, 'full shot stays linked');
+  assert.match(cropped, /aspect-ratio:196\/136/, "x clamped at 0, 48px padding on the other sides");
+  assert.match(cropped, /left:0%;top:-82\.353%/);
+  assert.match(render({ selector: '#a', screenshot: 'shots/k.png' }), /<a class="shot" href/, 'no box: full image');
+  assert.match(render({ selector: '#a', screenshot: 'shots/k__a0-0.png', box: { x: 1, y: 1, width: 5, height: 5 } }), /<a class="shot" href/, 'already a node clip: untouched');
 });

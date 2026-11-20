@@ -128,3 +128,11 @@ test('report: a populated results.journeys renders the "User journeys" section d
   assert.match(html, new RegExp(`<dialog class="shot-dialog" id="${dialogId}"`), 'the same dialog is rendered by the Scope section');
   assert.match(html, /clicks Settings/);
 });
+
+test('report: section headings label rules and occurrences separately', async () => {
+  const dir = freshDir('report-heading');
+  writeResults(dir, buildResults());
+  await runReport(dir);
+  const html = fs.readFileSync(path.join(dir, 'report.html'), 'utf8');
+  assert.match(html, /<p class="sec-aside">1 issue · 2 occurrences<\/p>/);
+});

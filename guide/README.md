@@ -37,3 +37,11 @@ The build warns about any missing source and skips it.
 - `lib/css.mjs`, `lib/client.mjs`: styles (theme tokens are CSS custom properties at the top of `css.mjs`), and a small vanilla script for the tabs and filters.
 - `lib/charts.mjs`: the SVG half-donuts and bars.
 - `assets/`: screenshots taken from sample report outputs.
+- `assets/icon.svg`: the project icon. A red capital A (failure) is overlapped by a green small a
+  (fix). The glyphs are Inter ExtraBold converted to paths, so the file needs no font. The PNGs are
+  rendered from it:
+  ```sh
+  magick -background none -density 300 guide/assets/icon.svg -resize 1024x1024 -depth 8 .claude-plugin/icon.png
+  magick -background none -density 300 guide/assets/icon.svg -resize 180x180 -depth 8 guide/assets/icon-180.png
+  magick -background none guide/assets/icon.svg -resize 32x32 -depth 8 guide/assets/icon-32.png
+  ```

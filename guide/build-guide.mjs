@@ -8,7 +8,7 @@ import { loadCatalog, summarize } from './lib/data.mjs';
 import { CSS } from './lib/css.mjs';
 import { CLIENT_JS } from './lib/client.mjs';
 import { esc } from './lib/charts.mjs';
-import { hero, workflow, skills, modalities } from './lib/sections-a.mjs';
+import { hero, install, workflow, skills, modalities } from './lib/sections-a.mjs';
 import { reports, issues, catalog, footer } from './lib/sections-b.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -38,7 +38,7 @@ const cat = await loadCatalog(root);
 const sum = { ...summarize(cat), tools: cat.tools.length };
 if (!cat.rules.length) throw new Error(`No rules parsed from ${join(root, 'rules.md')}`);
 
-const NAV = [['workflow', 'Workflow'], ['skills', 'Skills'], ['modalities', 'Modalities'], ['reports', 'Reports'], ['issues', 'Issues'], ['catalog', 'Catalog']];
+const NAV = [['install', 'Install'], ['workflow', 'Workflow'], ['skills', 'Skills'], ['modalities', 'Modalities'], ['reports', 'Reports'], ['issues', 'Issues'], ['catalog', 'Catalog']];
 const SOURCES = ['rules.md', 'skills/accessibility-assessment/references/criteria-coverage.md', 'skills/accessibility-assessment/knowledge/wcag/criteria.json', 'skills/accessibility-assessment/knowledge/apg/index.md', 'skills/accessibility-assessment/scripts/lib/modality-rules.mjs', 'skills/screen-reader-validation/scripts/lib/rules.mjs'];
 
 const html = `<!doctype html>
@@ -47,6 +47,9 @@ const html = `<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Accessibility-assess skills · Guide</title>
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
 <meta name="description" content="How to use the accessibility-assess skills: workflow, skills, modalities, reports, example issues and the full WCAG 2.2 criteria catalog.">
 <style>${CSS}
 .no-js .tabs{display:none}.no-js .panel[hidden]{display:block!important;margin-top:24px;border-top:1px solid var(--line);border-radius:var(--r-lg)}</style>
@@ -59,6 +62,7 @@ const html = `<!doctype html>
 </div></header>
 <main id="main" tabindex="-1">
 ${hero(sum, img)}
+${install()}
 ${workflow()}
 ${skills()}
 ${modalities(sum)}

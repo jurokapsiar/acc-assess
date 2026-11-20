@@ -247,8 +247,10 @@ function criteriaSection() {
 function groupSection(title, id, groups, kind, prefix) {
   if (!groups.length) return '';
   const occ = groups.reduce((n, g) => n + g.occ.length, 0);
+  const plural = (n, w) => `${n} ${w}${n === 1 ? '' : 's'}`;
+  const noun = { failure: 'issue', review: 'item', suggestion: 'suggestion' }[kind];
   return `<section id="${id}" class="sec" aria-labelledby="${id}-h">
-  ${secHead(id, id, title, groups.length, `${occ} occurrence${occ === 1 ? '' : 's'}`)}
+  ${secHead(id, id, title, groups.length, `${plural(groups.length, noun)} · ${plural(occ, 'occurrence')}`)}
   <div class="panel-box">${groups.map((g, i) => groupHtml(g, id, scLink, { targets, where }, { kind, marker: `${prefix}${i + 1}` })).join('\n')}</div>
 </section>`;
 }

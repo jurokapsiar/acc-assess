@@ -11,7 +11,7 @@ function annotated(img, file, alt, pins, items, caption) {
 export function reports(img) {
   const card = (t, title, file, alt, cap, wide) => `<article class="box ${t} reveal${wide ? ' wide' : ''}"><div class="hd"><h4 style="margin:0">${esc(title)}</h4></div><div class="bd">${img(file, alt)}</div><p class="small muted" style="margin:0;padding:10px 14px;border-top:1px solid var(--line-soft)">${esc(cap)}</p></article>`;
   return `<section id="reports" aria-labelledby="reports-h"><div class="wrap">
-<div class="shead"><span class="num" aria-hidden="true">04</span><h2 id="reports-h">The reports</h2><p>Static HTML that opens from disk. Every finding links to a screen, a state, a viewport, a crop and a source line.</p></div>
+<div class="shead"><span class="num" aria-hidden="true">05</span><h2 id="reports-h">The reports</h2><p>Static HTML that opens from disk. Every finding links to a screen, a state, a viewport, a crop and a source line.</p></div>
 ${annotated(img, 'report-summary.png', 'Assessment report summary section.', [[33, 12], [63, 12], [95, 12], [26, 40], [30, 66], [91, 37]], [
     ['Issues by severity', 'Failures as a half-donut, split by impact.'],
     ['Criteria', 'Criteria with issues, needing review, or with nothing detected. Never "pass": tools can only fail to find problems.'],
@@ -100,7 +100,7 @@ ${x.heard ? `<dl class="heard"><dt>Heard</dt><dd>${esc(x.heard[0])}</dd><dt>Expe
 <div>${x.trace ? `<h4>Escalation trace</h4><pre><code>${esc(x.trace)}</code></pre>` : ''}${x.img ? `<figure class="shotbox">${img(...x.img)}</figure>` : ''}${x.img2 ? `<figure class="shotbox" style="margin-top:12px">${img(...x.img2)}</figure>` : ''}</div>`;
   };
   return `<section id="issues" aria-labelledby="issues-h"><div class="wrap">
-<div class="shead"><span class="num" aria-hidden="true">05</span><h2 id="issues-h">Example issues</h2><p>One from each assessor. Every issue carries the evidence, the steps to reproduce it and a fix you can apply.</p></div>
+<div class="shead"><span class="num" aria-hidden="true">06</span><h2 id="issues-h">Example issues</h2><p>One from each assessor. Every issue carries the evidence, the steps to reproduce it and a fix you can apply.</p></div>
 <div class="issues">${ISSUES.map((x) => `<article class="box issue ${x.t} reveal"><div class="hd"><h3>${esc(x.title)}</h3><ul class="chips" aria-label="Details"><li>${toolChip(x.tool)}</li><li>${chip(`k-${x.kind}`, esc(x.kind))}</li>${x.impact ? `<li>${chip(`imp-${x.impact}`, esc(x.impact))}</li>` : ''}<li>${chip('', `<b>SC</b> ${esc(x.sc)}`)}</li><li>${chip('', `<code>${esc(x.rule)}</code>`)}</li>${x.modality ? `<li>${chip('', `<b>modality</b> ${esc(x.modality)}`)}</li>` : ''}</ul></div><div class="bd">${body(x)}</div></article>`).join('')}</div>
 </div></section>`;
 }
@@ -131,7 +131,7 @@ export function catalog(cat, sum) {
   const apgRows = cat.patterns.map((p) => `<tr${data({ search: `${p.slug} ${p.name} ${p.summary} ${p.tools.join(' ')}`.toLowerCase(), levels: '', principles: '', tools: p.tools.join(' ') })}><td class="id" data-label="Pattern"><code>${esc(p.slug)}</code></td><td data-label="Name">${esc(p.name)}</td><td data-label="Summary">${esc(p.summary)}</td><td data-label="Assessed by">${toolsCell(p.tools)}</td><td data-label="Rules">${ruleList(p.rules)}</td></tr>`).join('');
   const panel = (id, kind, noun, head, rows, first) => `<div class="panel" id="p-${id}" role="tabpanel" aria-labelledby="tab-${id}" data-kind="${kind}" data-noun="${noun}"${first ? '' : ' hidden'}><div class="tblwrap"><table class="cat"><caption class="sr-only">${esc(noun[0].toUpperCase() + noun.slice(1))}</caption><thead><tr>${head.map((h) => `<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div><p class="empty" hidden>No ${noun} match these filters.</p></div>`;
   return `<section id="catalog" aria-labelledby="catalog-h"><div class="wrap">
-<div class="shead"><span class="num" aria-hidden="true">06</span><h2 id="catalog-h">Criteria catalog</h2><p>Every WCAG 2.2 criterion, rule and APG pattern the suite covers, and what assesses it. Generated from the rule sources.</p></div>
+<div class="shead"><span class="num" aria-hidden="true">07</span><h2 id="catalog-h">Criteria catalog</h2><p>Every WCAG 2.2 criterion, rule and APG pattern the suite covers, and what assesses it. Generated from the rule sources.</p></div>
 <div class="charts">
 <div class="box t-summary chart reveal"><div class="hd"><h3>Rules by assessor</h3></div><div class="bd">${halfDonut(ruleSeg, { label: 'Rules by assessor', total: sum.rules, caption: 'rules' })}</div></div>
 <div class="box t-criteria chart reveal"><div class="hd"><h3>Criteria by level</h3></div><div class="bd">${halfDonut(lvSeg, { label: 'Criteria by level', total: sum.criteria, caption: 'criteria' })}</div></div>

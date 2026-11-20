@@ -38,9 +38,12 @@ test('asset lookups follow the installed Guidepup manifest', () => {
   assert.equal(missing.path, null);
   assert.equal(missing.version, '9.9-test');
   assert.equal(missing.expected, path.win32.join(cache, 'nvda', 'all', '9.9-test', 'extracted', 'nvda.exe'));
-  fs.mkdirSync(path.dirname(missing.expected), { recursive: true });
-  fs.writeFileSync(missing.expected, '');
-  assert.equal(findNvdaAsset(cache, manifest).path, missing.expected);
+  // findNvdaAsset builds a win32 path; off Windows that string is a single junk filename in the cwd, so only write it there.
+  if (process.platform === 'win32') {
+    fs.mkdirSync(path.dirname(missing.expected), { recursive: true });
+    fs.writeFileSync(missing.expected, '');
+    assert.equal(findNvdaAsset(cache, manifest).path, missing.expected);
+  }
   assert.equal(findNvdaAsset(cache, null).path, null, 'no manifest: never guesses a version');
 
   assert.equal(findVoiceOverAsset('/c', manifest, '23.1.0').supported, false);

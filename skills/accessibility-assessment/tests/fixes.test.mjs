@@ -60,8 +60,10 @@ test('fixes: an annotated+reviewed rule renders ready, an unannotated one render
   // "changes[].file" is resolved against the sourceRoot (cwd fixes.mjs runs from, i.e.
   // SKILL_DIR per helpers.mjs's spawnAsync) - point at a real fixture file so existingChanges
   // is non-empty and the reviewed rule actually qualifies as ready.
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'Modal.html'), '<div class="modal">\n');
   const annotations = {
-    'focus-trap': { reviewed: true, fix: 'Trap focus inside the modal.', changes: [{ file: 'tests/fixtures/contrast.html', line: 1, proposed: '<!doctype html>' }] },
+    'focus-trap': { reviewed: true, fix: 'Trap focus inside the modal.', changes: [{ file: path.relative(SKILL_DIR, path.join(dir, 'Modal.html')).split(path.sep).join('/'), line: 1, proposed: '<div class="modal" role="dialog">' }] },
   };
   writeRun(dir, { findings, annotations });
   const { code, stdout } = await runFixes(dir);
@@ -186,18 +188,18 @@ test('fixes: suggestion files are marked optional for conformance', async () => 
 
 test('fixes: one file per rule + component; changes go to the component they edit, unsourced nodes stay rule-only', async () => {
   const dir = freshDir('fixes-split');
-  const node = (id, source) => ({ selector: '#' + id, html: `<button id="${id}" class="${id}">`, identity: { tag: 'button' }, screenshot: null, source });
+  const node = (id, source) => ({ selector: 'html', html: `<html data-id="${id}">`, identity: { tag: 'html' }, screenshot: null, source });
   const findings = [{
     id: 'F0001', kind: 'failure', source: 'axe', rule: 'button-name', target: TARGET.key,
     nodes: [
-      node('a', { file: 'tests/fixtures/contrast.html', line: 1, component: 'Toolbar' }),
+      node('a', { file: 'tests/fixtures/contrast.html', line: 2, component: 'Toolbar' }),
       node('b', { file: 'lib/Button.jsx', line: 3, component: 'Button', chain: [{ file: 'lib/Button.jsx', line: 3, component: 'Button' }, { file: 'tests/fixtures/spacing.html', line: 2, component: 'Form' }] }),
       node('c', null),
     ],
   }];
   const changes = [
-    { file: 'tests/fixtures/contrast.html', line: 1, proposed: '<!doctype html>' },
-    { file: 'tests/fixtures/spacing.html', line: 1, proposed: '<!doctype html>' },
+    { file: 'tests/fixtures/contrast.html', line: 2, proposed: '<html lang="en">' },
+    { file: 'tests/fixtures/spacing.html', line: 2, proposed: '<html lang="en">' },
   ];
   writeRun(dir, { findings, annotations: { 'button-name': { reviewed: true, fix: 'Name it.', changes } } });
   const { stdout } = await runFixes(dir);
@@ -207,12 +209,67 @@ test('fixes: one file per rule + component; changes go to the component they edi
   const read = (f) => fs.readFileSync(path.join(dir, f), 'utf8');
   const toolbar = read('fix-failure-axe-button-name--contrast-toolbar.md');
   assert.match(toolbar, /"issue": "failure:axe:button-name@tests\/fixtures\/contrast.html#Toolbar"/);
-  assert.match(toolbar, /contrast\.html:1-1/);
+  assert.match(toolbar, /contrast\.html:2-2/);
   assert.match(toolbar, /report\.html#issues-axe-button-name\)/, 'report link points at the rule group');
   assert.doesNotMatch(toolbar, /spacing\.html/);
-  assert.match(read('fix-failure-axe-button-name--button.md'), /spacing\.html:1-1/, 'call-site change routed via the owner chain');
+  assert.match(read('fix-failure-axe-button-name--button.md'), /spacing\.html:2-2/, 'call-site change routed via the owner chain');
   const rest = read('fix-failure-axe-button-name.md');
-  assert.match(rest, /"#c"/);
-  assert.doesNotMatch(rest, /"#a"|"#b"/);
+  assert.doesNotMatch(rest, /contrast\.html|spacing\.html/);
   assert.match(rest, /None of the annotated changes edits this component/);
+});
+
+// Wrong-line guard + overlap warning: a throwaway source file in the run dir, addressed relative to SKILL_DIR (the cwd fixes.mjs runs from).
+function writeSource(dir, lines) {
+  fs.mkdirSync(dir, { recursive: true });
+  fs.writeFileSync(path.join(dir, 'page.html'), lines.join('\n') + '\n');
+  return path.relative(SKILL_DIR, path.join(dir, 'page.html')).split(path.sep).join('/');
+}
+const btn = { selector: '.btn', html: '<div class="btn" onclick="x()">Open details</div>', identity: { tag: 'div', text: 'Open details' }, screenshot: null };
+const page = ['<button type="submit">Subscribe</button>', '<div class="btn" onclick="x()">Open details</div>'];
+
+test('fixes: changes whose lines do not contain the target node stay draft with a warning; correct lines stay ready', async () => {
+  const dir = freshDir('fixes-wrong-lines');
+  const file = writeSource(dir, page);
+  const findings = [{ id: 'F0001', kind: 'failure', source: 'axe', rule: 'keyboard-unreachable', target: TARGET.key, nodes: [btn] }];
+  const run = async (line) => {
+    writeRun(dir, { findings, annotations: { 'keyboard-unreachable': { reviewed: true, fix: 'Use a button.', changes: [{ file, line, proposed: '<button class="btn">Open details</button>' }] } } });
+    const { stdout } = await runFixes(dir);
+    return { stdout, md: fs.readFileSync(path.join(dir, 'fix-failure-axe-keyboard-unreachable.md'), 'utf8') };
+  };
+  const wrong = await run(1);
+  assert.match(wrong.stdout, /0 ready, 1 draft/);
+  assert.match(wrong.md, /\| Status \| draft \|/);
+  assert.match(wrong.md, /\*\*Not ready:\*\* change 1: WARNING: lines 1-1 of .*do not appear to contain the affected element/);
+  const right = await run(2);
+  assert.match(right.stdout, /1 ready, 0 draft/);
+  assert.match(right.md, /\| Status \| ready \|/);
+});
+
+test('fixes: an attribute-only selector is matched on its value, so a generic tag on the wrong line is not enough', async () => {
+  const dir = freshDir('fixes-wrong-attr');
+  const file = writeSource(dir, ['<input id="n" type="text">', '<input type="email" placeholder="Email">']);
+  const findings = [{ id: 'F0001', kind: 'failure', source: 'agent', rule: 'label-missing', target: TARGET.key, nodes: [{ selector: 'input[type=email]', identity: { tag: 'input' }, screenshot: null }] }];
+  writeRun(dir, { findings, annotations: { 'label-missing': { reviewed: true, fix: 'Label it.', changes: [{ file, line: 1, proposed: 'x' }] } } });
+  assert.match((await runFixes(dir)).stdout, /0 ready, 1 draft/);
+  writeRun(dir, { findings, annotations: { 'label-missing': { reviewed: true, fix: 'Label it.', changes: [{ file, line: 2, proposed: 'x' }] } } });
+  assert.match((await runFixes(dir)).stdout, /1 ready, 0 draft/);
+});
+
+test('fixes: ready fix files whose changes overlap one source range warn in both files and on stderr (and stay ready)', async () => {
+  const dir = freshDir('fixes-overlap');
+  const file = writeSource(dir, [...page, '<div class="btn">z</div>']);
+  const mk = (id, rule) => ({ id, kind: 'failure', source: 'axe', rule, target: TARGET.key, nodes: [btn] });
+  const ann = (line) => ({ reviewed: true, fix: 'x', changes: [{ file, line, proposed: '<div class="btn">y</div>' }] });
+  writeRun(dir, { findings: [mk('F1', 'rule-a'), mk('F2', 'rule-b')], annotations: { 'rule-a': ann(2), 'rule-b': ann(2) } });
+  const { stdout, stderr } = await runFixes(dir);
+  assert.match(stdout, /2 ready, 0 draft/);
+  assert.match(stderr, /fix-failure-axe-rule-a\.md: .*overlaps .*fix-failure-axe-rule-b\.md/);
+  const a = fs.readFileSync(path.join(dir, 'fix-failure-axe-rule-a.md'), 'utf8');
+  assert.match(a, /\*\*Warning:\*\* .*overlaps .*in fix-failure-axe-rule-b\.md/);
+  assert.match(fs.readFileSync(path.join(dir, 'fix-failure-axe-rule-b.md'), 'utf8'), /in fix-failure-axe-rule-a\.md/);
+  // disjoint ranges: no warning
+  writeRun(dir, { findings: [mk('F1', 'rule-a'), mk('F2', 'rule-b')], annotations: { 'rule-a': { ...ann(2) }, 'rule-b': { reviewed: true, fix: 'x', changes: [{ file, line: 3, proposed: '<button class="btn">' }] } } });
+  const second = await runFixes(dir);
+  assert.match(second.stdout, /2 ready, 0 draft/);
+  assert.equal(second.stderr, '');
 });
