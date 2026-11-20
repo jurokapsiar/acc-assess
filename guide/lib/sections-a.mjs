@@ -69,13 +69,6 @@ export function hero(sum, img) {
 <h1 id="top-h">Accessibility-assess skills</h1>
 <p class="lede">A set of skills that validate accessibility based on user journeys, using deterministic tools and agents. <a href="https://github.com/dequelabs/axe-core">axe-core</a> static analysis, <a href="https://github.com/microsoft/abledom">AbleDOM</a> real-time analysis and <a href="https://www.w3.org/WAI/ARIA/apg/">WAI-ARIA APG</a> pattern review against <a href="https://www.w3.org/TR/WCAG22/">WCAG 2.2</a> combine into a comprehensive analysis.</p>
 <p class="note">It still does not replace manual testing. It aims to make manual testing more accurate. <strong>Research phase:</strong> no evals yet, and validated with few models so far.</p>
-<div class="cta"><a class="btn primary" href="#install">Install</a><a class="btn" href="#workflow">See the workflow</a><a class="btn" href="#catalog">Browse the criteria catalog</a></div>
-<dl class="stats">
-<div><dt>rules</dt><dd>${sum.rules}</dd></div>
-<div><dt>WCAG 2.2 criteria</dt><dd>${sum.criteria}</dd></div>
-<div><dt>APG patterns</dt><dd>${sum.patterns}</dd></div>
-<div><dt>assessors</dt><dd>${sum.tools}</dd></div>
-</dl>
 </div>
 <figure class="frame"><div class="bar" aria-hidden="true"><i></i><i></i><i></i><span>report.html</span></div>${img('report-summary.png', 'Report summary: half-donut charts for issues and criteria, issue groups by severity and a strip of screen thumbnails.')}</figure>
 </div></section>`;
